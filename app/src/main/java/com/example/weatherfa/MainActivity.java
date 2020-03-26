@@ -1,5 +1,6 @@
 package com.example.weatherfa;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -58,10 +59,11 @@ public class MainActivity extends AppCompatActivity {
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item){//响应menu的item
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.city_settings:
-                Toast.makeText(MainActivity.this,"item is clicked.",
-                        Toast.LENGTH_SHORT).show();
+                   Intent intent = new Intent();
+                intent.setClass(MainActivity.this, CityManagement.class);
+                startActivity(intent);
                 return true;
             default://确保onSupportNavigateUp被调用
                 return super.onOptionsItemSelected(item);
