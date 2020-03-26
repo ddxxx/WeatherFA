@@ -1,4 +1,4 @@
-package com.example.weatherfa.ui.gallery;
+package com.example.weatherfa.ui.feedback;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -14,17 +14,17 @@ import androidx.lifecycle.ViewModelProviders;
 
 import com.example.weatherfa.R;
 
-public class GalleryFragment extends Fragment {
+public class FeedbackFragment extends Fragment {
 
-    private GalleryViewModel galleryViewModel;
+    private FeedbackViewModel feedbackViewModel;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        galleryViewModel =
-                ViewModelProviders.of(this).get(GalleryViewModel.class);
-        View root = inflater.inflate(R.layout.fragment_gallery, container, false);
+        feedbackViewModel =
+                ViewModelProviders.of(this).get(FeedbackViewModel.class);
+        View root = inflater.inflate(R.layout.fragment_feedback, container, false);
         final TextView textView = root.findViewById(R.id.text_gallery);
-        galleryViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
+        feedbackViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
             public void onChanged(@Nullable String s) {
                 textView.setText(s);
