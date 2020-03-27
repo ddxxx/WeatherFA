@@ -14,18 +14,15 @@
     <string name="home_second">Home Second</string>
     <string name="title_activity_settings">Settings</string>
 
-    <!-- Preference Titles -->
-    <string name="messages_header">Messages</string>
-    <string name="sync_header">Sync</string>
+    <string name="city_management_edit">编辑</string>
+    <string name="city_management_del">Delete city</string>
+    <string name="city_management_add">Add city</string>
 
-    <!-- Messages Preferences -->
-    <string name="signature_title">Your signature</string>
-    <string name="reply_title">Default reply action</string>
+    <string name="loc_city_text">当前城市</string>
+    <string name="loc_city_button">定位中…</string>
+    <string name="hot_city_text">热门城市</string>
+    <string name="hot_city1_button">北京</string>
+    <string name="hot_city2_button">上海</string>
+    <string name="hot_city3_button">济南</string>
 
-    <!-- Sync Preferences -->
-    <string name="sync_title">Sync email periodically</string>
-    <string name="attachment_title">Download incoming attachments</string>
-    <string name="attachment_summary_on">Automatically download attachments for incoming emails
-    </string>
-    <string name="attachment_summary_off">Only download attachments when manually requested</string>
 </resources>
