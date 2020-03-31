@@ -23,4 +23,19 @@
         <item name="android:textSize">20sp</item>
     </style>
 
+    <!--AddCity-->
+    <style name="CustomTheme" parent="DefaultCityPickerTheme">
+        <item name="cpCancelTextColor">@color/colorGreen</item>
+        <item name="cpSearchCursorDrawable">@color/colorGreen</item>
+        <item name="cpIndexBarNormalTextColor">@color/colorGreen</item>
+        <item name="cpIndexBarSelectedTextColor">@color/colorGreen</item>
+        <item name="cpSectionHeight">@dimen/cp_section_height</item>
+        <item name="cpOverlayBackground">@color/colorGreen</item>
+    </style>
+
+    <style name="CustomAnim">
+        <item name="android:windowEnterAnimation">@anim/custom_push_down_in</item>
+        <item name="android:windowExitAnimation">@anim/custom_push_up_out</item>
+    </style>
+
 </resources>

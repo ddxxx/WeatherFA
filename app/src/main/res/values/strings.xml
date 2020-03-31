@@ -18,11 +18,14 @@
     <string name="city_management_del">Delete city</string>
     <string name="city_management_add">Add city</string>
 
-    <string name="loc_city_text">当前城市</string>
-    <string name="loc_city_button">定位中…</string>
-    <string name="hot_city_text">热门城市</string>
-    <string name="hot_city1_button">北京</string>
-    <string name="hot_city2_button">上海</string>
-    <string name="hot_city3_button">济南</string>
+    <string name="cur_city_text">当前城市</string>
+    <string name="hot_city_cb">指定热门城市</string>
+    <string name="enable_anim_cb">启用动画效果</string>
+    <string name="anim_cb">自定义动画</string>
+    <string name="textview1">点击更换：</string>
+    <string name="button1">默认主题</string>
+    <string name="pick_button">选择城市</string>
+
+
 
 </resources>

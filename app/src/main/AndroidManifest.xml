@@ -38,7 +38,7 @@
         <!--去掉添加城市页面的标题栏-->
         <activity
             android:name=".AddCity"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/DefaultCityPickerTheme">
         </activity>
         <activity android:name=".CityManagement" />
         <activity
