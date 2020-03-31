@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    tools:context=".AddCity">
+
+    <TextView
+        android:id="@+id/cur_city_text"
+        android:layout_width="match_parent"
+        android:layout_height="72dp"
+        android:gravity="center"
+        android:text="@string/cur_city_text"
+        android:textSize="18sp" />
+
+    <CheckBox
+        android:id="@+id/hot_city_cb"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:text="@string/hot_city_cb"
+        android:textSize="16sp" />
+
+    <CheckBox
+        android:id="@+id/enable_anim_cb"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:text="@string/enable_anim_cb"
+        android:textSize="16sp"/>
+
+    <CheckBox
+        android:id="@+id/anim_cb"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:text="@string/anim_cb"
+        android:textSize="16sp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/textview1" />
+
+    <Button
+        android:id="@+id/style_button"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:layout_marginTop="8dp"
+        android:paddingLeft="32dp"
+        android:paddingRight="32dp"
+        android:text="@string/button1"
+        android:textSize="16sp" />
+
+    <Button
+        android:id="@+id/pick_button"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="24dp"
+        android:background="@color/colorPrimary"
+        android:text="@string/pick_button"
+        android:textColor="@android:color/white"
+        android:textSize="16sp" />
+</LinearLayout>
