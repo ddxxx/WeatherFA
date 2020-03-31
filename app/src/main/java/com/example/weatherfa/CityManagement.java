@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -26,12 +27,15 @@ import com.zaaach.citypicker.model.LocatedCity;
 import java.util.List;
 
 public class CityManagement extends AppCompatActivity {
-    private List<HotCity> hotCities;
+    private TextView pickedCityTV;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setTheme(R.style.DefaultCityPickerTheme);
         setContentView(R.layout.activity_city_management);
+
+        pickedCityTV=findViewById(R.id.picked_city_tv);
         //添加返回按钮
         ActionBar actionBar=getSupportActionBar();
         if(actionBar!=null){
@@ -41,21 +45,17 @@ public class CityManagement extends AppCompatActivity {
         //添加fab：添加城市
         FloatingActionButton fab = findViewById(R.id.city_management_add);
         fab.setOnClickListener(new View.OnClickListener() {
-      /*      @Override
+            @Override
             public void onClick(View v) {
-                Log.d("CityM","点击了添加城市");
-                CityPicker.from(CityManagement.this)
+                CityPicker.from(CityManagement.this)//.enableAnimation(enable)     6.
+                        // .setAnimationStyle(anim)
                         .setLocatedCity(null)
-                        .setHotCities(hotCities)
+                        //  .setHotCities(hotCities)
                         .setOnPickListener(new OnPickListener() {
                             @Override
                             public void onPick(int position, City data) {
-                                //通过String.format("当前城市： %s, %s",
-                                        data.getName(), data.getCode())获得选择的城市
-                                curCityTV.setText(String.format("当前城市： %s, %s",
+                                pickedCityTV.setText(String.format("当前城市： %s, %s",
                                         data.getName(), data.getCode()));
-
-
                                 Toast.makeText(getApplicationContext(),
                                         String.format("点击的数据: %s, %s",
                                                 data.getName(), data.getCode()),
@@ -64,7 +64,7 @@ public class CityManagement extends AppCompatActivity {
 
                             @Override
                             public void onLocate() {
-                                //开始定位，模拟定位？？没有定位逻辑？？
+                                //开始定位，模拟定位
                                 new Handler().postDelayed(new Runnable() {
                                     @Override
                                     public void run() {
@@ -82,18 +82,9 @@ public class CityManagement extends AppCompatActivity {
                             }
                         }).show();
             }
-       */
-            /*跳转到AddCity的响应*/
-            @Override
-            public void onClick(View view) {
-                //跳转到添加城市页面
-                Intent intent = new Intent();
-                intent.setClass(CityManagement.this, AddCity.class);
-                startActivity(intent);
-            }
-
-
         });
+
+
 
     }
     @Override

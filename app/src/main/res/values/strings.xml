@@ -17,6 +17,8 @@
     <string name="city_management_edit">编辑</string>
     <string name="city_management_del">Delete city</string>
     <string name="city_management_add">Add city</string>
+    <string name="picked_city_tv">选择的城市</string>
+
 
     <string name="cur_city_text">当前城市</string>
     <string name="hot_city_cb">指定热门城市</string>
