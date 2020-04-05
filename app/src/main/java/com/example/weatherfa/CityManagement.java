@@ -28,7 +28,7 @@ public class CityManagement extends AppCompatActivity {
     private TextView pickedCityTV;
     //默认定位城市为北京（如果设为空，LocateState为failure时会闪退（库问题））
     private LocatedCity locatedCity=new LocatedCity("北京","北京","101010100");
-    private int errodCode;
+    private int errodCode=-1;
     //声明AMapLocationClient类对象
     public AMapLocationClient mLocationClient = null;
     //声明定位回调监听器
@@ -127,13 +127,12 @@ public class CityManagement extends AppCompatActivity {
         public void onLocationChanged(AMapLocation aMapLocation) {
             if(aMapLocation!=null){
                 errodCode=aMapLocation.getErrorCode();
-              //  errodCode=aMapLocation.getErrorCode();
                 if(aMapLocation.getErrorCode()==0){
                     //去掉“市”
-                    String s1=aMapLocation.getCity().substring(0,aMapLocation.getCity().length()-1);
+                    String s1=aMapLocation.getDistrict().substring(0,aMapLocation.getDistrict().length()-1);
                     String s2=aMapLocation.getProvince().substring(0,aMapLocation.getProvince().length()-1);
                     locatedCity=new LocatedCity(s1, s2,aMapLocation.getCityCode());
-                    Log.e("112233",aMapLocation.getCity());
+                    Log.e("112233",aMapLocation.getDistrict());
                 }else{
                     //定位失败（错误码，错误信息）
                     Log.e("112233",

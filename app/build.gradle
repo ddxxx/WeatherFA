@@ -20,8 +20,13 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+    compileOptions {
 
+        sourceCompatibility JavaVersion.VERSION_1_8
 
+        targetCompatibility JavaVersion.VERSION_1_8
+
+    }
 
 }
 
@@ -40,7 +45,17 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
-    implementation fileTree(include: ['*.jar'],dir:'libs')
-    implementation 'com.zaaach:citypicker:2.0.3'	//必选
-    implementation 'androidx.recyclerview:recyclerview:1.0.0'
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'com.zaaach:citypicker:2.0.3'    //必选
+    implementation 'androidx.recyclerview:recyclerview:1.1.0'
+
+    implementation 'org.litepal.android:core:3.0.0'
+    implementation 'com.squareup.okhttp3:okhttp:4.4.1'
+    implementation 'com.google.code.gson:gson:2.8.6'
+    implementation 'com.github.bumptech.glide:glide:4.11.0'
+
+    implementation 'com.squareup.okio:okio:2.4.3'
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.14.0'
+    implementation 'com.google.code.gson:gson:2.8.6'
+    implementation 'com.facebook.stetho:stetho:1.5.0'
 }
