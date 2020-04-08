@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.weatherfa.MainActivity;
 import com.example.weatherfa.R;
 import com.example.weatherfa.adapter.WtForecastAdapter;
 import com.example.weatherfa.adapter.WtLifeIndexAdapter;
@@ -59,6 +60,8 @@ public class WeatherFragment extends Fragment{
     private List<WtLifeIndex> wtLifeIndexList=new ArrayList<>();
     private RecyclerView lifeIndexRV;
 
+    private String cityName;
+
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         WeatherViewModel weatherViewModel = ViewModelProviders.of(this).get(WeatherViewModel.class);
@@ -71,6 +74,7 @@ public class WeatherFragment extends Fragment{
         detailRV= root.findViewById(R.id.detail_recycler_view);//-------detail
         forecastRV= root.findViewById(R.id.forecast_recycler_view);//------forecast
         lifeIndexRV= root.findViewById(R.id.life_index_recycler_view);//------lifeindex
+
 
         requestWeather("东平");
 
@@ -130,7 +134,7 @@ public class WeatherFragment extends Fragment{
         nowWmdTV.setText(weather.result.realTime.week);//只显示周几
         String sCity=weather.result.distinct+"-"+weather.result.county;
         nowCityTV.setText(sCity);
-        String sTt=weather.result.realTime.wtType+"  "+weather.result.realTime.wtTemp;
+        String sTt=weather.result.realTime.wtType+"  "+weather.result.realTime.wtTemp+"℃";
         nowTtTV.setText(sTt);
         //----------detail
         WtDetail aqi=new WtDetail(R.drawable.wt_aqi,"PM2.5",weather.result.realTime.wtAqi);

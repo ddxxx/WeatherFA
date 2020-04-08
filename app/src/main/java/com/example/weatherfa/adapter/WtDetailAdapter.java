@@ -17,11 +17,11 @@ import java.util.List;
 public class WtDetailAdapter extends RecyclerView.Adapter<WtDetailAdapter.ViewHolder> {
     private List<WtDetail> mWtDetailList;
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView dIcon;
         TextView dType;
         TextView dValue;
-        public ViewHolder(@NonNull View itemView) {
+        ViewHolder(@NonNull View itemView) {
             super(itemView);
             dIcon=(ImageView)itemView.findViewById(R.id.detail_item_icon_iv);
             dType=(TextView)itemView.findViewById(R.id.detail_item_type_tv);
@@ -36,7 +36,7 @@ public class WtDetailAdapter extends RecyclerView.Adapter<WtDetailAdapter.ViewHo
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view= LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.wt_detail_item,parent,false);
-        ViewHolder holder=new ViewHolder(view);
+        ViewHolder holder= new ViewHolder(view);
         return holder;
     }
 

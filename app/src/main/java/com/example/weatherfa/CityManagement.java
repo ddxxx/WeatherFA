@@ -1,9 +1,13 @@
 package com.example.weatherfa;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.menu.MenuView;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.ClipData;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -17,6 +21,8 @@ import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationClientOption;
 import com.amap.api.location.AMapLocationListener;
+import com.example.weatherfa.adapter.WtCityAdapter;
+import com.example.weatherfa.wtclass.WtCity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.zaaach.citypicker.CityPicker;
 import com.zaaach.citypicker.adapter.OnPickListener;
@@ -24,8 +30,22 @@ import com.zaaach.citypicker.model.City;
 import com.zaaach.citypicker.model.LocateState;
 import com.zaaach.citypicker.model.LocatedCity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class CityManagement extends AppCompatActivity {
-    private TextView pickedCityTV;
+    /*
+    组件声明
+     */
+    //loc
+    private TextView locCityTV;
+    private View locCityView;
+    //recycleview
+    private List<WtCity> wtCityList=new ArrayList<>();
+    private RecyclerView cityRV;
+    /*
+    定位、搜索城市变量声明
+     */
     //默认定位城市为北京（如果设为空，LocateState为failure时会闪退（库问题））
     private LocatedCity locatedCity=new LocatedCity("北京","北京","101010100");
     private int errodCode=-1;
@@ -41,14 +61,18 @@ public class CityManagement extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setTheme(R.style.DefaultCityPickerTheme);
         setContentView(R.layout.activity_city_management);
+        //实例化
+        locCityTV=(TextView)findViewById(R.id.loc_city_name_tv);
+        locCityView=(View)findViewById(R.id.loc_city_lo);
+        cityRV=(RecyclerView)findViewById(R.id.city_recycler_view);
 
-        pickedCityTV=findViewById(R.id.picked_city_tv);
-        //添加返回按钮
         ActionBar actionBar=getSupportActionBar();
         if(actionBar!=null){
             actionBar.setHomeButtonEnabled(true);
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+        //定位
+        Location();
         //添加fab：添加城市
         FloatingActionButton fab = findViewById(R.id.city_management_add);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -61,18 +85,17 @@ public class CityManagement extends AppCompatActivity {
                         .setOnPickListener(new OnPickListener() {
                             @Override
                             public void onPick(int position, City data) {
-                                pickedCityTV.setText(String.format("当前城市： %s, %s",
-                                        data.getName(), data.getCode()));
+                                String sCity=data.getName()+"-"+data.getProvince();
+
                                 Toast.makeText(getApplicationContext(),
-                                        String.format("点击的数据: %s, %s",
-                                                data.getName(), data.getCode()),
+                                        String.format("点击的数据: %s",sCity),
                                         Toast.LENGTH_SHORT).show();
+                                showCity(sCity);
                             }
 
                             @Override
                             public void onLocate() {
                                 //自定义定位
-                                Location();
 
                                 new Handler().postDelayed(new Runnable() {
                                     @Override
@@ -84,7 +107,7 @@ public class CityManagement extends AppCompatActivity {
                                             CityPicker.from(CityManagement.this).locateComplete(
                                                     locatedCity, LocateState.FAILURE);
                                     }
-                                }, 700);
+                                }, 0);
                             }
                             @Override
                             public void onCancel() {
@@ -95,6 +118,19 @@ public class CityManagement extends AppCompatActivity {
             }
         });
     }
+
+    private void showCity(String sCity){
+        //----------recyclerview
+        Log.e("112233","选择城市："+sCity);
+        WtCity wtCity=new WtCity(sCity);
+        wtCityList.add(wtCity);
+        cityRV.setNestedScrollingEnabled(false);
+        cityRV.setLayoutManager(new LinearLayoutManager(this));
+        WtCityAdapter adapter=new WtCityAdapter(wtCityList,this);//添加跳转响应，adapter需context参数
+        cityRV.setAdapter(adapter);
+    }
+
+
 
     private void Location(){//定位
         Log.e("112233","定位函数");
@@ -132,6 +168,17 @@ public class CityManagement extends AppCompatActivity {
                     String s1=aMapLocation.getDistrict().substring(0,aMapLocation.getDistrict().length()-1);
                     String s2=aMapLocation.getProvince().substring(0,aMapLocation.getProvince().length()-1);
                     locatedCity=new LocatedCity(s1, s2,aMapLocation.getCityCode());
+                    //loc跳转到mainactivity（但返回后回到上一个界面）
+                    locCityView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Intent intent=new Intent(CityManagement.this,MainActivity.class);
+                            intent.putExtra("cityName",s1);
+                            startActivity(intent);
+                            finish();
+                        }
+                    });
+                    locCityTV.setText(s1+"-"+s2);
                     Log.e("112233",aMapLocation.getDistrict());
                 }else{
                     //定位失败（错误码，错误信息）
@@ -140,13 +187,7 @@ public class CityManagement extends AppCompatActivity {
                 }
             }
         }
-    }/*
-    @Override
-    protected void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
     }
-
-   */
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu){//添加menu响应
@@ -159,14 +200,6 @@ public class CityManagement extends AppCompatActivity {
         switch (item.getItemId()){
             case android.R.id.home://返回键
                 this.finish();
-                return true;
-            case R.id.city_management_del:
-                Toast.makeText(CityManagement.this,"delete city clicked.",
-                        Toast.LENGTH_SHORT).show();
-                return true;
-            case R.id.city_management_edit:
-                Toast.makeText(CityManagement.this,"edit city clicked.",
-                        Toast.LENGTH_SHORT).show();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

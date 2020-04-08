@@ -13,14 +13,19 @@ import android.view.Menu;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.weatherfa.ui.weather.WeatherFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.navigation.NavigationView;
 
+import androidx.annotation.ContentView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.TooltipCompat;
 import androidx.core.view.GravityCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -37,7 +42,7 @@ import java.util.List;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity{
-
+    public int aaa=1;
     private AppBarConfiguration mAppBarConfiguration;
 
     @Override
@@ -60,8 +65,20 @@ public class MainActivity extends AppCompatActivity{
          NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
          NavigationUI.setupWithNavController(navigationView, navController);
 
+
+    }
+    //---------跳转
+    /*失败，可否直接跳转到activity
+    protected void onRestart() {
+        super.onRestart();
+        Log.e("112233","onRestart");
+        int id=getIntent().getIntExtra("fragment_id",-1);
+        if(id==0){
+
+        }
     }
 
+     */
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {//响应menu

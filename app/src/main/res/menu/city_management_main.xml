@@ -1,14 +1,3 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <item
-        android:id="@+id/city_management_del"
-        android:icon="@drawable/ic_city_del_w"
-        android:title="@string/city_management_del"
-        app:showAsAction="always" />
-    <item
-        android:id="@+id/city_management_edit"
-        android:title="@string/city_management_edit"
-        app:showAsAction="ifRoom" />
-</menu>
+    xmlns:android="http://schemas.android.com/apk/res/android"/>

@@ -10,7 +10,7 @@ public class AboutViewModel extends ViewModel {
 
     public AboutViewModel() {
         mText = new MutableLiveData<>();
-        mText.setValue("This is slideshow fragment");
+        mText.setValue("WeatherFA\n天气预报及历史天气分析\n版本：v1.0");
     }
 
     public LiveData<String> getText() {

@@ -10,7 +10,7 @@ public class FeedbackViewModel extends ViewModel {
 
     public FeedbackViewModel() {
         mText = new MutableLiveData<>();
-        mText.setValue("This is gallery fragment");
+        mText.setValue("请发送邮件至：\n1426138878@qq.com");
     }
 
     public LiveData<String> getText() {
