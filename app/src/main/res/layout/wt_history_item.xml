@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/history_item_cv"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    android:layout_margin="3dp"
+    app:cardElevation="1dp">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?android:attr/selectableItemBackground"
+        android:orientation="vertical"
+        android:padding="8dp">
+
+        <Button
+            android:id="@+id/h_item_fulls_bt"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_gravity="top|end"
+            android:background="@drawable/h_fullscreen"
+            android:contentDescription="@string/content_description_default"
+            android:scaleType="fitXY" />
+
+        <ImageView
+            android:id="@+id/h_item_icon_iv"
+            android:layout_width="65dp"
+            android:layout_height="65dp"
+            android:layout_gravity="center_horizontal"
+            android:contentDescription="@string/content_description_default"
+            android:scaleType="fitXY"
+            tools:srcCompat="@drawable/ic_wt_update_b" />
+
+        <TextView
+            android:id="@+id/h_item_type_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="4dp"
+            android:lines="1"
+            android:text="@string/h_line"
+            android:textSize="@dimen/text_size_caption" />
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

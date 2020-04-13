@@ -22,12 +22,13 @@
                 android:padding="20dp">
 
                 <ImageView
+                    android:tint="@color/white"
                     android:id="@+id/wt_now_icon_iv"
                     android:layout_width="170dp"
                     android:layout_height="170dp"
                     android:layout_marginStart="30dp"
-                    android:layout_marginTop="50dp"
-                    android:layout_marginBottom="20dp"
+                    android:layout_marginTop="40dp"
+                    android:layout_marginBottom="30dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -89,7 +90,8 @@
                     android:id="@+id/detail_title"
                     android:layout_width="match_parent"
                     android:layout_height="42dp"
-                    android:text="详情" />
+                    android:text="详情"
+                    android:textSize="18sp"/>
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/detail_recycler_view"
@@ -122,7 +124,8 @@
                     android:id="@+id/forecast_title"
                     android:layout_width="match_parent"
                     android:layout_height="42dp"
-                    android:text="未来一周" />
+                    android:text="未来一周"
+                    android:textSize="18sp" />
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/forecast_recycler_view"
@@ -156,13 +159,49 @@
                     android:id="@+id/index_title"
                     android:layout_width="match_parent"
                     android:layout_height="42dp"
-                    android:text="生活指数" />
+                    android:text="生活指数"
+                    android:textSize="18sp" />
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/life_index_recycler_view"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/index_title"
+                    android:layout_marginBottom="4dp"
+                    android:layout_marginTop="12dp"
+                    tools:listitem="@layout/wt_lifeindex_item" />
+            </RelativeLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/history_card_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="4dp"
+            app:cardElevation="1dp"
+            app:contentPadding="8dp">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:descendantFocusability="blocksDescendants">
+
+                <TextView
+                    android:id="@+id/history_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="42dp"
+                    android:text="历史天气"
+                    android:textSize="18sp" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/history_recycler_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/history_title"
                     android:layout_marginBottom="4dp"
                     android:layout_marginTop="12dp"
                     tools:listitem="@layout/wt_lifeindex_item" />

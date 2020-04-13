@@ -12,7 +12,7 @@ public class RealTime {
     public String wtHumi;
     @SerializedName("wtWindNm")
     public String wtWindType;//风向
-    public String wtWindp;//风力
+    public String wtWinp;//风力
     public String wtWinds;//风速
 
     public String wtAqi;//pm2.5

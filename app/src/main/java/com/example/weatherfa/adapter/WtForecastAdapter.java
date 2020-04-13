@@ -1,5 +1,6 @@
 package com.example.weatherfa.adapter;
 
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -51,6 +52,7 @@ public class WtForecastAdapter extends RecyclerView.Adapter<WtForecastAdapter.Vi
         holder.fWeek.setText(wtForecast.getWeek());
         holder.fDate.setText(wtForecast.getDate());
         holder.fIcon.setImageResource(wtForecast.getIcon());
+    //    holder.fIcon.setColorFilter(Integer.parseInt("#000000"));
         holder.fType.setText(wtForecast.getType());
         holder.fMaxTemp.setText(wtForecast.getMaxTemp());
         holder.fMinTemp.setText(wtForecast.getMinTemp());

@@ -28,6 +28,7 @@
         tools:text="08.07" />
 
     <ImageView
+        android:tint="@color/colorPrimary"
         android:id="@+id/fore_item_icon_iv"
         android:layout_width="32dp"
         android:layout_height="32dp"

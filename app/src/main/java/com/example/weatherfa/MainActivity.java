@@ -2,6 +2,7 @@ package com.example.weatherfa;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -45,40 +46,59 @@ public class MainActivity extends AppCompatActivity{
     public int aaa=1;
     private AppBarConfiguration mAppBarConfiguration;
 
+    private SharedPreferences sp;
+    private SharedPreferences.Editor editor;
+    private String name="",telphone="";
+
+    private TextView nameTV,telphoneTV;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);//不可删改
         setSupportActionBar(toolbar);
+/*
+        nameTV=(TextView)findViewById(R.id.name_tv);
+        telphoneTV=(TextView)findViewById(R.id.telphone_tv);
+
+ */
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
+        /*
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                if (item.getItemId() == R.id.nav_header_refresh) {
+                    Toast.makeText(MainActivity.this,"anle",Toast.LENGTH_SHORT).show();
+                    sp.getString("name", name);
+                    sp.getString("telphone", telphone);
+                    nameTV.setText(name);
+                    telphoneTV.setText(telphone);
+                }
+                return true;
+            }
+
+        });
+        */
+
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
 
         mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_weather, R.id.nav_feedback, R.id.nav_about)
+                R.id.nav_weather,R.id.nav_userinfo,
+                R.id.nav_feedback, R.id.nav_about)
                 .setDrawerLayout(drawer)
                 .build();
+
          NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
          NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
          NavigationUI.setupWithNavController(navigationView, navController);
 
 
-    }
-    //---------跳转
-    /*失败，可否直接跳转到activity
-    protected void onRestart() {
-        super.onRestart();
-        Log.e("112233","onRestart");
-        int id=getIntent().getIntExtra("fragment_id",-1);
-        if(id==0){
 
-        }
     }
-
-     */
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {//响应menu

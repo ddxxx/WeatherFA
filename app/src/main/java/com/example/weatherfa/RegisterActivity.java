@@ -138,9 +138,11 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                                         // 注册成功，记录token
                                     sp = getSharedPreferences("login_info", MODE_PRIVATE);
                                     editor = sp.edit();
-                                    editor.putString("token", "token_value");
+                                    editor.putString("token", "token_value");//三个信息都存储，用于drawer显示
+                                    editor.putString("name",username);
                                     editor.putString("telphone", telphone);
                                     editor.putString("password", password1); // 注意这里是password1
+                                    editor.commit();
 
                                     if (editor.commit()) {
                                         Intent it_register_to_main = new Intent(RegisterActivity.this, MainActivity.class);
@@ -153,7 +155,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                             //===        getResponseErrMsg(RegisterActivity.this, responseBodyStr);
                                 }
                             } else {
-                                Log.d(TAG, "服务器异常");
+                                Log.e(TAG, "服务器异常");
                                 showToastInThread(RegisterActivity.this, responseStr);
                             }
                         }

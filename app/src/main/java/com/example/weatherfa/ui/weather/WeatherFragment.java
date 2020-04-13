@@ -18,9 +18,9 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.weatherfa.MainActivity;
 import com.example.weatherfa.R;
 import com.example.weatherfa.adapter.WtForecastAdapter;
+import com.example.weatherfa.adapter.WtHistoryAdapter;
 import com.example.weatherfa.adapter.WtLifeIndexAdapter;
 import com.example.weatherfa.gson.FutureEDay;
 import com.example.weatherfa.wtclass.WtDetail;
@@ -29,6 +29,7 @@ import com.example.weatherfa.gson.Weather;
 import com.example.weatherfa.util.HttpUtil;
 import com.example.weatherfa.util.Utility;
 import com.example.weatherfa.wtclass.WtForecast;
+import com.example.weatherfa.wtclass.WtHistory;
 import com.example.weatherfa.wtclass.WtLifeIndex;
 
 import org.jetbrains.annotations.NotNull;
@@ -59,6 +60,9 @@ public class WeatherFragment extends Fragment{
     //生活指数
     private List<WtLifeIndex> wtLifeIndexList=new ArrayList<>();
     private RecyclerView lifeIndexRV;
+    //历史天气
+    private List<WtHistory> wtHistoryList=new ArrayList<>();
+    private RecyclerView historyRV;
 
     private String cityName;
 
@@ -74,9 +78,19 @@ public class WeatherFragment extends Fragment{
         detailRV= root.findViewById(R.id.detail_recycler_view);//-------detail
         forecastRV= root.findViewById(R.id.forecast_recycler_view);//------forecast
         lifeIndexRV= root.findViewById(R.id.life_index_recycler_view);//------lifeindex
+        historyRV=root.findViewById(R.id.history_recycler_view);//-----history
+
+        requestWeather("石景山");
 
 
-        requestWeather("东平");
+        WtHistory hist1=new WtHistory(R.drawable.h_fullscreen,R.drawable.h_line,"温度变化分析");
+        wtHistoryList.add(hist1);
+        WtHistory hist2=new WtHistory(R.drawable.h_fullscreen,R.drawable.h_histogram,"天气情况分析");
+        wtHistoryList.add(hist2);
+        historyRV.setNestedScrollingEnabled(false);//禁止滑动
+        historyRV.setLayoutManager(new GridLayoutManager(getActivity(), 2));//GridLayout
+        WtHistoryAdapter adapter0=new WtHistoryAdapter(wtHistoryList);
+        historyRV.setAdapter(adapter0);
 
         return root;
     }
@@ -127,12 +141,19 @@ public class WeatherFragment extends Fragment{
         });
     }
 
+    private int imageId(String s){
+        return this.getResources().getIdentifier(s,"drawable",
+                Objects.requireNonNull(getContext()).getOpPackageName());
+    }
+
     //weather相关组件更新-----改为：初始化list数据
     private void showWeatherInfo(Weather weather){
-        //------------now
-        nowIconIV.setImageResource(R.drawable.sunny);
+
+        String sIcon="d"+weather.result.realTime.wtIcon;
+        nowIconIV.setImageResource(imageId(sIcon));
         nowWmdTV.setText(weather.result.realTime.week);//只显示周几
-        String sCity=weather.result.distinct+"-"+weather.result.county;
+        String sCity=weather.result.county;
+
         nowCityTV.setText(sCity);
         String sTt=weather.result.realTime.wtType+"  "+weather.result.realTime.wtTemp+"℃";
         nowTtTV.setText(sTt);
@@ -141,19 +162,23 @@ public class WeatherFragment extends Fragment{
         wtDetailList.add(aqi);
         WtDetail humi=new WtDetail(R.drawable.wt_humi,"湿度",weather.result.realTime.wtHumi);
         wtDetailList.add(humi);
-        WtDetail wind=new WtDetail(R.drawable.wt_wind,"风力",weather.result.realTime.wtWindp);
-        wtDetailList.add(wind);
+        WtDetail windtype=new WtDetail(R.drawable.wt_windtype,"风向",weather.result.realTime.wtWindType);
+        wtDetailList.add(windtype);
         WtDetail vis=new WtDetail(R.drawable.wt_vis,"能见度",weather.result.realTime.wtVisibility);
         wtDetailList.add(vis);
         WtDetail rain=new WtDetail(R.drawable.wt_rain,"降水量",weather.result.realTime.wtRainfall);
         wtDetailList.add(rain);
+        WtDetail windp=new WtDetail(R.drawable.wt_windp,"风力",weather.result.realTime.wtWinp);
+        wtDetailList.add(windp);
         detailRV.setNestedScrollingEnabled(false);//禁止滑动
         detailRV.setLayoutManager(new GridLayoutManager(getActivity(), 3));//GridLayout
         WtDetailAdapter adapter1=new WtDetailAdapter(wtDetailList);
         detailRV.setAdapter(adapter1);
         //------------forecast
+        int drawableId;
         for(FutureEDay eDay:weather.result.futureDay){//(gson类名，变量，实体)
-            WtForecast wf=new WtForecast(eDay.week,eDay.dateYmd.substring(5,10),R.drawable.ic_back_b,
+            String sIcon1="d"+eDay.wtIcon1;
+            WtForecast wf=new WtForecast(eDay.week,eDay.dateYmd.substring(5,10),imageId(sIcon1),
                     eDay.wtType1,eDay.wtTemp1+"℃",eDay.wtTemp2+"℃");
             wtForecastList.add(wf);
         }

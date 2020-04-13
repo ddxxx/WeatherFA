@@ -8,6 +8,7 @@
     <string name="city_settings">Cities</string>
 
     <string name="menu_weather">天气</string>
+    <string name="menu_userinfo">修改用户名或密码</string>
     <string name="menu_feedback">反馈与建议</string>
     <string name="menu_about">关于</string>
 
@@ -29,6 +30,9 @@
     <string name="pick_button">选择城市</string>
 
     <string name="content_description_default">Image description</string>
+    <!--history-->
+    <string name="h_line">温度变化分析</string>
+    <string name="h_histogram">天气情况分析</string>
 
 
     <!--wt_now-->
@@ -75,5 +79,12 @@
     <string name="et_password2">请再次输入密码</string>
     <string name="bt_register">提交注册</string>
     <string name="tv_count_down">跳过</string>
+
+    <string name="edit_name">修改昵称</string>
+    <string name="edit_name_tv">请输入昵称</string>
+    <string name="edit_finish_bt">提交修改</string>
+    <string name="edit_pwd">修改密码</string>
+    <string name="edit_pwd_origin_tv">请输入原密码</string>
+    <string name="edit_pwd1_tv">请输入新密码</string>
 
 </resources>

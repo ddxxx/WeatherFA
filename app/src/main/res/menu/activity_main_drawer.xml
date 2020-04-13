@@ -2,12 +2,15 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
-
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_weather"
             android:icon="@drawable/ic_weather_b"
             android:title="@string/menu_weather" />
+        <item
+            android:id="@+id/nav_userinfo"
+            android:icon="@drawable/ic_change_b"
+            android:title="@string/menu_userinfo" />
         <item
             android:id="@+id/nav_feedback"
             android:icon="@drawable/ic_email_b"
