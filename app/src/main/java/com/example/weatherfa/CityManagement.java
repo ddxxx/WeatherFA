@@ -2,18 +2,19 @@ package com.example.weatherfa;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.view.menu.MenuView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.content.ClipData;
+import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,15 +35,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CityManagement extends AppCompatActivity {
-    /*
-    组件声明
-     */
+    //sharedpreferences
+    private SharedPreferences sp;
+    private SharedPreferences.Editor editor;
+
     //loc
     private TextView locCityTV;
     private View locCityView;
     //recycleview
     private List<WtCity> wtCityList=new ArrayList<>();
     private RecyclerView cityRV;
+    private WtCityAdapter adapter;
     /*
     定位、搜索城市变量声明
      */
@@ -55,7 +58,10 @@ public class CityManagement extends AppCompatActivity {
     public AMapLocationListener mLocationListener = new MyAMapLocationListener();
     //声明AMapLocationClientOption对象
     public AMapLocationClientOption mLocationOption = null;
+    //===========
+    private Button delCityBT;
 
+    @SuppressLint("CommitPrefEdits")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,12 +71,26 @@ public class CityManagement extends AppCompatActivity {
         locCityTV=(TextView)findViewById(R.id.loc_city_name_tv);
         locCityView=(View)findViewById(R.id.loc_city_lo);
         cityRV=(RecyclerView)findViewById(R.id.city_recycler_view);
+        //============
+        delCityBT=(Button)findViewById(R.id.city_item_del_bt);
+        //sharedpreferences
+        sp=getSharedPreferences("city_list",MODE_PRIVATE);
+        editor=sp.edit();
+        adapter = new WtCityAdapter(wtCityList, this);//添加跳转响应，adapter需context参数
+
+
+        cityRV.setNestedScrollingEnabled(false);
+        cityRV.setLayoutManager(new LinearLayoutManager(this));
+        cityRV.setAdapter(adapter);
+        adapter.setOnItemClickListener(MyItemClickListener);
+
 
         ActionBar actionBar=getSupportActionBar();
         if(actionBar!=null){
             actionBar.setHomeButtonEnabled(true);
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+        showCity();
         //定位
         Location();
         //添加fab：添加城市
@@ -85,18 +105,16 @@ public class CityManagement extends AppCompatActivity {
                         .setOnPickListener(new OnPickListener() {
                             @Override
                             public void onPick(int position, City data) {
-                                String sCity=data.getName()+"-"+data.getProvince();
-
+                                String sCity=data.getName();
                                 Toast.makeText(getApplicationContext(),
                                         String.format("点击的数据: %s",sCity),
                                         Toast.LENGTH_SHORT).show();
-                                showCity(sCity);
+                                addCity(sCity);
                             }
 
                             @Override
                             public void onLocate() {
                                 //自定义定位
-
                                 new Handler().postDelayed(new Runnable() {
                                     @Override
                                     public void run() {
@@ -118,19 +136,67 @@ public class CityManagement extends AppCompatActivity {
             }
         });
     }
+    //item及其内部控件的事件监听
+    private WtCityAdapter.OnItemClickListener MyItemClickListener=
+            new WtCityAdapter.OnItemClickListener() {
+                @Override
+                public void onItemClick(View v, WtCityAdapter.ViewName viewName, int position) {
+                    switch (v.getId()){
+                        case R.id.city_item_del_bt:
+                            adapter.delDate(position);
+                            saveToSP(wtCityList);
+                            break;
+                        default:
+                            String sCityName=wtCityList.get(position).getName();
+                            editor.putString("cityname",sCityName);
+                            editor.commit();
+                            //跳转
+                            Intent intent=new Intent(CityManagement.this, MainActivity.class);
+                            intent.putExtra("fragment_id",0);
+                            startActivity(intent);
+                            break;
+                    }
+                }
+                @Override
+                public void onItemLongClick(View v) {
 
-    private void showCity(String sCity){
-        //----------recyclerview
-        Log.e("112233","选择城市："+sCity);
+                }
+            };
+
+    //选择的城市保存到sp中
+    private void addCity(String sCity){
         WtCity wtCity=new WtCity(sCity);
-        wtCityList.add(wtCity);
-        cityRV.setNestedScrollingEnabled(false);
-        cityRV.setLayoutManager(new LinearLayoutManager(this));
-        WtCityAdapter adapter=new WtCityAdapter(wtCityList,this);//添加跳转响应，adapter需context参数
-        cityRV.setAdapter(adapter);
+        int i;
+        for(i=0;i<wtCityList.size();i++){
+            if(wtCityList.get(i).getName().equals(wtCity.getName())){
+                adapter.delDate(i);
+                saveToSP(wtCityList);
+                break;
+            }
+        }
+        adapter.addData(wtCity);
+        //存储
     }
 
+    public void saveToSP(List<WtCity> wtCityList1){
+        editor.putInt("city_nums",wtCityList1.size());
+        for(int i=0;i<wtCityList1.size();i++){
+            editor.putString("item_"+i,wtCityList1.get(i).getName());
+        }
+        editor.commit();
+    }
 
+    private void showCity(){
+        cityRV.removeAllViews();
+        int cityNums=sp.getInt("city_nums",-1);
+        if(cityNums!=-1) {
+           for (int i = 0; i < cityNums; i++) {
+               String sCityName = sp.getString("item_" + i, null);
+               WtCity wtCity = new WtCity(sCityName);
+               wtCityList.add(wtCity);
+           }
+       }
+    }
 
     private void Location(){//定位
         Log.e("112233","定位函数");
@@ -158,6 +224,7 @@ public class CityManagement extends AppCompatActivity {
         //启动定位
         mLocationClient.startLocation();
     }
+
     private class MyAMapLocationListener implements AMapLocationListener{//重写定位监听类
         @Override
         public void onLocationChanged(AMapLocation aMapLocation) {

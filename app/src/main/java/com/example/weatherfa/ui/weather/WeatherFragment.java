@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.weatherfa.MainActivity;
 import com.example.weatherfa.R;
 import com.example.weatherfa.adapter.WtForecastAdapter;
 import com.example.weatherfa.adapter.WtHistoryAdapter;
@@ -45,6 +46,8 @@ import okhttp3.Response;
 
 
 public class WeatherFragment extends Fragment{
+    private SharedPreferences sp;
+    private SharedPreferences.Editor editor;
     /*
     组件声明；详细天气信息
      */
@@ -66,6 +69,7 @@ public class WeatherFragment extends Fragment{
 
     private String cityName;
 
+
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         WeatherViewModel weatherViewModel = ViewModelProviders.of(this).get(WeatherViewModel.class);
@@ -80,7 +84,12 @@ public class WeatherFragment extends Fragment{
         lifeIndexRV= root.findViewById(R.id.life_index_recycler_view);//------lifeindex
         historyRV=root.findViewById(R.id.history_recycler_view);//-----history
 
-        requestWeather("石景山");
+        sp= this.getActivity().getSharedPreferences("city_list",this.getActivity().MODE_PRIVATE);
+        editor=sp.edit();
+        cityName=sp.getString("cityname","");
+
+
+        requestWeather(cityName);
 
 
         WtHistory hist1=new WtHistory(R.drawable.h_fullscreen,R.drawable.h_line,"温度变化分析");
@@ -154,7 +163,7 @@ public class WeatherFragment extends Fragment{
         nowWmdTV.setText(weather.result.realTime.week);//只显示周几
         String sCity=weather.result.county;
 
-        nowCityTV.setText(sCity);
+        nowCityTV.setText(cityName);
         String sTt=weather.result.realTime.wtType+"  "+weather.result.realTime.wtTemp+"℃";
         nowTtTV.setText(sTt);
         //----------detail

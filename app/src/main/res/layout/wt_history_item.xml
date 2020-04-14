@@ -27,7 +27,7 @@
         <ImageView
             android:id="@+id/h_item_icon_iv"
             android:layout_width="65dp"
-            android:layout_height="65dp"
+            android:layout_height="80dp"
             android:layout_gravity="center_horizontal"
             android:contentDescription="@string/content_description_default"
             android:scaleType="fitXY"
