@@ -28,5 +28,14 @@
         android:name="com.example.weatherfa.ui.userinfo.UserinfoFragment"
         android:label="@string/menu_userinfo"
         tools:layout="@layout/fragment_userinfo" />
+    <fragment
+        android:id="@+id/nav_setting"
+        android:name="com.example.weatherfa.ui.SettingFragment"
+        android:label="@string/menu_setting"
+        tools:layout="@layout/fragment_setting" >
+        <action
+            android:id="@+id/action_SettingFragment_to_WeatherFragment"
+            app:destination="@id/nav_weather" />
+    </fragment>
 
 </navigation>

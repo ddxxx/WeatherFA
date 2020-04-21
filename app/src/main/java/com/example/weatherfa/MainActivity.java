@@ -1,5 +1,6 @@
 package com.example.weatherfa;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -9,8 +10,10 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.Menu;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -46,23 +49,12 @@ public class MainActivity extends AppCompatActivity{
     public int aaa=1;
     private AppBarConfiguration mAppBarConfiguration;
 
-    private SharedPreferences sp;
-    private SharedPreferences.Editor editor;
-    private String name="",telphone="";
-
-    private TextView nameTV,telphoneTV;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);//不可删改
         setSupportActionBar(toolbar);
-/*
-        nameTV=(TextView)findViewById(R.id.name_tv);
-        telphoneTV=(TextView)findViewById(R.id.telphone_tv);
-
- */
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
@@ -79,15 +71,13 @@ public class MainActivity extends AppCompatActivity{
                 }
                 return true;
             }
-
         });
         */
-
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
 
         mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_weather,R.id.nav_userinfo,
+                R.id.nav_weather,R.id.nav_userinfo,R.id.nav_setting,
                 R.id.nav_feedback, R.id.nav_about)
                 .setDrawerLayout(drawer)
                 .build();
@@ -95,9 +85,6 @@ public class MainActivity extends AppCompatActivity{
          NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
          NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
          NavigationUI.setupWithNavController(navigationView, navController);
-
-
-
     }
 
     @Override
@@ -112,6 +99,7 @@ public class MainActivity extends AppCompatActivity{
                 Intent intent = new Intent();
                 intent.setClass(MainActivity.this, CityManagement.class);
                 startActivity(intent);
+                finish();
                 return true;
             default://确保onSupportNavigateUp被调用
                 return super.onOptionsItemSelected(item);
@@ -124,5 +112,4 @@ public class MainActivity extends AppCompatActivity{
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();
     }
-
 }

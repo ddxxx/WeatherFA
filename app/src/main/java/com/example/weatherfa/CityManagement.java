@@ -15,6 +15,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -46,6 +47,8 @@ public class CityManagement extends AppCompatActivity {
     private List<WtCity> wtCityList=new ArrayList<>();
     private RecyclerView cityRV;
     private WtCityAdapter adapter;
+
+    private RelativeLayout cityItemLO;
     /*
     定位、搜索城市变量声明
      */
@@ -73,8 +76,10 @@ public class CityManagement extends AppCompatActivity {
         cityRV=(RecyclerView)findViewById(R.id.city_recycler_view);
         //============
         delCityBT=(Button)findViewById(R.id.city_item_del_bt);
+
+        cityItemLO=findViewById(R.id.city_item_lo);
         //sharedpreferences
-        sp=getSharedPreferences("city_list",MODE_PRIVATE);
+        sp=getSharedPreferences("weatherfa",MODE_PRIVATE);
         editor=sp.edit();
         adapter = new WtCityAdapter(wtCityList, this);//添加跳转响应，adapter需context参数
 
@@ -93,6 +98,8 @@ public class CityManagement extends AppCompatActivity {
         showCity();
         //定位
         Location();
+        editor.putString("locCityName",locatedCity.getName());
+        editor.commit();
         //添加fab：添加城市
         FloatingActionButton fab = findViewById(R.id.city_management_add);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -141,20 +148,21 @@ public class CityManagement extends AppCompatActivity {
             new WtCityAdapter.OnItemClickListener() {
                 @Override
                 public void onItemClick(View v, WtCityAdapter.ViewName viewName, int position) {
-                    switch (v.getId()){
-                        case R.id.city_item_del_bt:
-                            adapter.delDate(position);
-                            saveToSP(wtCityList);
-                            break;
-                        default:
-                            String sCityName=wtCityList.get(position).getName();
-                            editor.putString("cityname",sCityName);
-                            editor.commit();
-                            //跳转
-                            Intent intent=new Intent(CityManagement.this, MainActivity.class);
-                            intent.putExtra("fragment_id",0);
-                            startActivity(intent);
-                            break;
+                    if (v.getId() == R.id.city_item_del_bt) {
+                        Toast.makeText(getApplicationContext(),
+                                "删除城市(" + wtCityList.get(position).getName() + ")成功",
+                                Toast.LENGTH_SHORT).show();
+                        adapter.delDate(position);
+                        saveToSP(wtCityList);
+                    } else {
+                        String sCityName = wtCityList.get(position).getName();
+                        editor.putString("cityname", sCityName);
+                        editor.commit();
+                        //跳转
+                        Intent intent = new Intent(CityManagement.this, MainActivity.class);
+                        intent.putExtra("fragment_id", 0);
+                        startActivity(intent);
+                        finish();
                     }
                 }
                 @Override
@@ -170,11 +178,12 @@ public class CityManagement extends AppCompatActivity {
         for(i=0;i<wtCityList.size();i++){
             if(wtCityList.get(i).getName().equals(wtCity.getName())){
                 adapter.delDate(i);
-                saveToSP(wtCityList);
+
                 break;
             }
         }
         adapter.addData(wtCity);
+        saveToSP(wtCityList);
         //存储
     }
 
@@ -187,7 +196,7 @@ public class CityManagement extends AppCompatActivity {
     }
 
     private void showCity(){
-        cityRV.removeAllViews();
+      //  cityRV.removeAllViews();
         int cityNums=sp.getInt("city_nums",-1);
         if(cityNums!=-1) {
            for (int i = 0; i < cityNums; i++) {
@@ -245,7 +254,7 @@ public class CityManagement extends AppCompatActivity {
                             finish();
                         }
                     });
-                    locCityTV.setText(s1+"-"+s2);
+                    locCityTV.setText(s1);
                     Log.e("112233",aMapLocation.getDistrict());
                 }else{
                     //定位失败（错误码，错误信息）
@@ -266,6 +275,9 @@ public class CityManagement extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item){//menu的item响应
         switch (item.getItemId()){
             case android.R.id.home://返回键
+                Intent intent=new Intent(CityManagement.this, MainActivity.class);
+                intent.putExtra("fragment_id",0);
+                startActivity(intent);
                 this.finish();
                 return true;
             default:

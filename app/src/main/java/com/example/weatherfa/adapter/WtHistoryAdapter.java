@@ -18,7 +18,11 @@ import java.util.List;
 public class WtHistoryAdapter extends RecyclerView.Adapter<WtHistoryAdapter.ViewHolder> {
     private List<WtHistory> mWtHistoryList;
 
-    static class ViewHolder extends RecyclerView.ViewHolder{
+    public WtHistoryAdapter(List<WtHistory> wtHistoryList){
+        mWtHistoryList=wtHistoryList;
+    }
+
+    class ViewHolder extends RecyclerView.ViewHolder{
         Button hFulls;
         ImageView hIcon;
         TextView hType;
@@ -29,10 +33,6 @@ public class WtHistoryAdapter extends RecyclerView.Adapter<WtHistoryAdapter.View
             hType=(TextView) itemView.findViewById(R.id.h_item_type_tv);
         }
     }
-    public WtHistoryAdapter(List<WtHistory> wtHistoryList){
-        mWtHistoryList=wtHistoryList;
-    }
-
 
     @NonNull
     @Override
@@ -54,5 +54,27 @@ public class WtHistoryAdapter extends RecyclerView.Adapter<WtHistoryAdapter.View
     public int getItemCount() {
         return mWtHistoryList.size();
     }
+    /*
+    //==响应
+    public enum ViewName{
+        ITEM,
+        PRACTISE
+    }
+    public interface OnItemClickListener{
+        void onItemClick(View v,ViewName viewName,int position);
+    }
+    private OnItemClickListener mOnItemClickListener;
+    public void setOnItemClickListener(OnItemClickListener listener){
+        this.mOnItemClickListener=listener;
+    }
 
+    public void onClick(View v){
+        int position=(int)v.getTag();
+        if(mOnItemClickListener!=null){
+            if(v.getId()==R.id.h_item_fulls_bt){
+                mOnItemClickListener.onItemClick(v,ViewName.PRACTISE,position);
+            }
+        }
+    }
+     */
 }

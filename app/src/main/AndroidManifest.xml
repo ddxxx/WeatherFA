@@ -22,19 +22,25 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:targetApi="n">
-        <activity android:name=".CountDownActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+        <activity android:name=".TempLineActivity"></activity>
 
-        </activity>
+        <service
+            android:name=".service.AutoUpdateService"
+            android:enabled="true"
+            android:exported="true"></service>
+
+        <activity
+            android:name=".CountDownActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".RegisterActivity" />
-        <activity android:name=".LoginActivity" />
-        <!-- 声明Service组件 -->
+        <activity android:name=".LoginActivity" /> <!-- 声明Service组件 -->
         <service android:name="com.amap.api.location.APSService" /> <!-- 设置高德key -->
         <meta-data
             android:name="com.amap.api.v2.apikey"
             android:value="f141e9f5480d679ced35913e09c19047" /> <!-- 去掉添加城市页面的标题栏 -->
         <activity
             android:name=".CityManagement"
+            android:label="城市管理"
             android:theme="@style/DefaultCityPickerTheme" />
         <activity
             android:name=".MainActivity"
@@ -42,6 +48,7 @@
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
