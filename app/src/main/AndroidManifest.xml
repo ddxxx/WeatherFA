@@ -22,9 +22,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:targetApi="n">
-        <activity android:name=".historyActivity.HWtStatisticsActivity">
-
-        </activity>
+        <activity android:name=".historyActivity.HWtTempActivity"></activity>
+        <activity android:name=".historyActivity.HWtStatisticsActivity"></activity>
 
         <service
             android:name=".service.AutoUpdateService"

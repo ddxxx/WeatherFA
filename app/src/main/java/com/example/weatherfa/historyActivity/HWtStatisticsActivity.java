@@ -77,11 +77,11 @@ public class HWtStatisticsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_h_wt_statistics);
         //获取当前城市名称
         SharedPreferences sp = this.getSharedPreferences("weatherfa", MODE_PRIVATE);
-        cityName= sp.getString("cityname","东平");
+        cityName = sp.getString("cityname", "东平");
         //标题栏相关设置
-        setTitle(cityName+"-历史天气统计");//名称
-        ActionBar actionBar=getSupportActionBar();//添加返回键
-        if(actionBar!=null){
+        setTitle(cityName + "-历史天气统计");//名称
+        ActionBar actionBar = getSupportActionBar();//添加返回键
+        if (actionBar != null) {
             actionBar.setHomeButtonEnabled(true);
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
@@ -89,7 +89,7 @@ public class HWtStatisticsActivity extends AppCompatActivity {
         initUI();//(函数)
     }
 
-    private void initUI(){
+    private void initUI() {
         //组件初始化
         mShowDatePickBtn = findViewById(R.id.query_bt);
         chart = findViewById(R.id.chart1);
@@ -120,14 +120,15 @@ public class HWtStatisticsActivity extends AppCompatActivity {
         //chart.animateY(1500);
         chart.getLegend().setEnabled(false);
     }
+
     /*
      okhttp异步请求进行注册
      参数统一传递字符串
      传递到后端再进行类型转换以适配数据库
      */
     private void asyncGetHWeather(final String cityName,
-                                final String date1,
-                                final String date2) {//城市名，起、止日期
+                                  final String date1,
+                                  final String date2) {//城市名，起、止日期
         // 发送请求属于耗时操作，开辟子线程
         new Thread(new Runnable() {
             @Override
@@ -136,12 +137,13 @@ public class HWtStatisticsActivity extends AppCompatActivity {
                 // 1、初始化okhttpClient对象
                 OkHttpClient okHttpClient = new OkHttpClient();
                 // 2、构建请求体
-                StringBuffer sb=new StringBuffer();
-                sb.append("cityName=").append(cityName)
+                StringBuffer sb = new StringBuffer();
+                sb.append("flag=").append("2")//flag作为标志，区分请求何种数据
+                        .append("&cityName=").append(cityName)
                         .append("&date1=").append(date1)
                         .append("&date2=").append(date2);   //设置表单参数
-                Log.i("Hwt",""+sb.toString());
-                RequestBody requestBody=RequestBody.create(FORM_CONTENT_TYPE,sb.toString());
+                Log.i("Hwt", "" + sb.toString());
+                RequestBody requestBody = RequestBody.create(FORM_CONTENT_TYPE, sb.toString());
                 // 3、发送请求，特别强调这里是POST方式
                 Request request = new Request.Builder()
                         .url(NetConstant.getGetHWeatherURL())
@@ -154,32 +156,34 @@ public class HWtStatisticsActivity extends AppCompatActivity {
                     public void onFailure(Call call, IOException e) {
                         Log.d("Hweather", "onFailure: " + e.getMessage());
                     }
+
                     @Override
                     public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                         // 先判断一下服务器是否异常
                         String responseStr = response.toString();
-                        Log.e("Hweather",responseStr);
+                        Log.e("Hweather", responseStr);
                         if (responseStr.contains("200")) {
                             // response.body().string()只能调用一次，多次调用会报错
                             String responseBodyStr = Objects.requireNonNull(response.body()).string();
+                            Log.e("fanhui",responseBodyStr);
                             try {
-                                JSONObject jsonObject=new JSONObject(responseBodyStr);//获得JSONBObject对象
-                                int success=jsonObject.getInt("success");
-                                if(success==200){
+                                JSONObject jsonObject = new JSONObject(responseBodyStr);//获得JSONBObject对象
+                                int success = jsonObject.getInt("success");
+                                if (success == 200) {
                                     /*
                                     将response的result中的weathertype放入String数组（用于x轴名称显示），
                                     total作为柱状图数值
                                      */
-                                    JSONArray ResultJSONArray=jsonObject.getJSONArray("result");
-                                    ArrayList<BarEntry> yVals=new ArrayList<>();
+                                    JSONArray ResultJSONArray = jsonObject.getJSONArray("result");
+                                    ArrayList<BarEntry> yVals = new ArrayList<>();
                                     String[] xValues = new String[20];
-                                    for(int i=0;i<ResultJSONArray.length();i++){
-                                        JSONObject resultJSONObject=ResultJSONArray.getJSONObject(i);
-                                        xValues[i]=resultJSONObject.getString("weathertype");
+                                    for (int i = 0; i < ResultJSONArray.length(); i++) {
+                                        JSONObject resultJSONObject = ResultJSONArray.getJSONObject(i);
+                                        xValues[i] = resultJSONObject.getString("xdata");
                                         //BarEntry(x轴index，y轴对应数值)
-                                        yVals.add(new BarEntry(i,resultJSONObject.getInt("total")));
+                                        yVals.add(new BarEntry(i, resultJSONObject.getInt("ydata")));
                                     }
-                                    drawChart(yVals,xValues);//绘制柱状图函数
+                                    drawChart(yVals, xValues);//绘制柱状图函数
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
@@ -215,9 +219,9 @@ public class HWtStatisticsActivity extends AppCompatActivity {
                 public void onSelectFinished(String startTime, String endTime) {
                     //按钮显示已选中日期
                     mShowDatePickBtn.setText(startTime.replace("-", ".")
-                            + R.string.to + endTime.replace("-", "."));
+                            + "至" + endTime.replace("-", "."));
                     //（函数）获取历史天气相关数据
-                    asyncGetHWeather(cityName,startTime,endTime);
+                    asyncGetHWeather(cityName, startTime, endTime);
                 }
             });
             //取消选择事件响应
@@ -231,8 +235,9 @@ public class HWtStatisticsActivity extends AppCompatActivity {
             mDoubleTimeSelectDialog.show();
         }
     }
+
     //获取当前系统时间，用于提示更新时间
-    private String nowTime(){
+    private String nowTime() {
         @SuppressLint("SimpleDateFormat") SimpleDateFormat simpleDateFormat =
                 new SimpleDateFormat("yyyy-MM-dd");// HH:mm:ss
         Date date = new Date(System.currentTimeMillis());
@@ -240,7 +245,7 @@ public class HWtStatisticsActivity extends AppCompatActivity {
     }
 
     //绘制柱状图（total-数值，weathertype-名称）
-    public void drawChart(ArrayList<BarEntry> yVals,String[] xValues){
+    public void drawChart(ArrayList<BarEntry> yVals, String[] xValues) {
 
         BarDataSet set1;
         set1 = new BarDataSet(yVals, "weather type");//初始化柱状图数据源（单柱状图，未设置显示）
@@ -262,120 +267,35 @@ public class HWtStatisticsActivity extends AppCompatActivity {
         chart.setFitBars(true);
         chart.invalidate();
     }
+
     //自定义x轴的名称显示
-    public static class XAxisValueFormatter implements IAxisValueFormatter{
+    public static class XAxisValueFormatter implements IAxisValueFormatter {
         private String[] xValues;
-        public XAxisValueFormatter(String[] xValues){
-            this.xValues=xValues;
+
+        public XAxisValueFormatter(String[] xValues) {
+            this.xValues = xValues;
         }
+
         @Override
         public String getFormattedValue(float value, AxisBase axis) {
-            return xValues[(int)value];
-        }
-    }
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu){//添加menu响应
-        getMenuInflater().inflate(R.menu.back_button,menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item){//menu的item响应
-        switch (item.getItemId()){
-            case android.R.id.home://返回键、
-                this.finish();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+            return xValues[(int) value];
         }
     }
 
-/*
-    @Override
-    public void onBackPressed() {
-    } */
- /*
+    //添加menu响应
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.history_menu, menu);
+        getMenuInflater().inflate(R.menu.back_button, menu);
         return true;
     }
 
+    //menu的item响应
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
-        switch (item.getItemId()) {
-           case R.id.viewGithub: {
-                Intent i = new Intent(Intent.ACTION_VIEW);
-                i.setData(Uri.parse("https://github.com/PhilJay/MPAndroidChart/blob/master/MPChartExample/src/com/xxmassdeveloper/mpchartexample/AnotherBarActivity.java"));
-                startActivity(i);
-                break;
-            }
-            case R.id.actionToggleValues: {
-
-                for (IDataSet set : chart.getData().getDataSets())
-                    set.setDrawValues(!set.isDrawValuesEnabled());
-
-                chart.invalidate();
-                break;
-            }
-            case R.id.actionToggleHighlight: {
-
-                if(chart.getData() != null) {
-                    chart.getData().setHighlightEnabled(!chart.getData().isHighlightEnabled());
-                    chart.invalidate();
-                }
-                break;
-            }
-            case R.id.actionTogglePinch: {
-                if (chart.isPinchZoomEnabled())
-                    chart.setPinchZoom(false);
-                else
-                    chart.setPinchZoom(true);
-
-                chart.invalidate();
-                break;
-            }
-            case R.id.actionToggleAutoScaleMinMax: {
-                chart.setAutoScaleMinMaxEnabled(!chart.isAutoScaleMinMaxEnabled());
-                chart.notifyDataSetChanged();
-                break;
-            }
-            case R.id.actionToggleBarBorders: {
-                for (IBarDataSet set : chart.getData().getDataSets())
-                    ((BarDataSet)set).setBarBorderWidth(set.getBarBorderWidth() == 1.f ? 0.f : 1.f);
-
-                chart.invalidate();
-                break;
-            }
-            case R.id.animateX: {
-                chart.animateX(2000);
-                break;
-            }
-            case R.id.animateY: {
-                chart.animateY(2000);
-                break;
-            }
-            case R.id.animateXY: {
-
-                chart.animateXY(2000, 2000);
-                break;
-            }
-
-            case R.id.save_item: {
-                if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-                    saveToGallery();
-                } else {
-                    requestStoragePermission(chart);
-                }
-                break;
-            }
+        if (item.getItemId() == android.R.id.home) {//返回键
+            this.finish();
+            return true;
         }
-        return true;
+        return super.onOptionsItemSelected(item);
     }
-    @Override
-    protected void saveToGallery() {
-        saveToGallery(chart, "AnotherBarActivity");
-    }
-*/
 }
