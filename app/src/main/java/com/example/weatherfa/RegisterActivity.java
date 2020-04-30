@@ -51,7 +51,6 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
         initUI();//组件初始化
         setOnClickListener();//点击事件响应
-
     }
 
     private void initUI() { // 初始化

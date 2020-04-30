@@ -33,7 +33,7 @@
     <string name="content_description_default">Image description</string>
     <!--history-->
     <string name="h_line">温度变化分析</string>
-    <string name="h_histogram">天气情况分析</string>
+    <string name="h_histogram">历史天气统计</string>
 
 
     <!--wt_now-->
@@ -88,7 +88,8 @@
     <string name="edit_pwd_origin_tv">请输入原密码</string>
     <string name="edit_pwd1_tv">请输入新密码</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <!--HWtStatisticsActivity-->
+    <string name="to">至</string>
+    <string name="save_item">存储至相册</string>
 
 </resources>

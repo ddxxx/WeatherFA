@@ -160,7 +160,6 @@ public class CityManagement extends AppCompatActivity {
                         editor.commit();
                         //跳转
                         Intent intent = new Intent(CityManagement.this, MainActivity.class);
-                        intent.putExtra("fragment_id", 0);
                         startActivity(intent);
                         finish();
                     }
@@ -267,7 +266,7 @@ public class CityManagement extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu){//添加menu响应
-        getMenuInflater().inflate(R.menu.city_management_main,menu);
+        getMenuInflater().inflate(R.menu.back_button,menu);
         return true;
     }
 

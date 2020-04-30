@@ -22,12 +22,14 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:targetApi="n">
-        <activity android:name=".TempLineActivity"></activity>
+        <activity android:name=".historyActivity.HWtStatisticsActivity">
+
+        </activity>
 
         <service
             android:name=".service.AutoUpdateService"
             android:enabled="true"
-            android:exported="true"></service>
+            android:exported="true" />
 
         <activity
             android:name=".CountDownActivity"

@@ -59,4 +59,8 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.6'
     implementation 'com.facebook.stetho:stetho:1.5.0'
     implementation 'androidx.gridlayout:gridlayout:1.0.0'
+
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.0.2'
+    implementation 'com.github.darrenfantasy:DoubleDatePicker:1.0'
+
 }

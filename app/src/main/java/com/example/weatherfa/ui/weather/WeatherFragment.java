@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,19 +16,16 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.example.weatherfa.CityManagement;
-import com.example.weatherfa.MainActivity;
 import com.example.weatherfa.R;
 import com.example.weatherfa.adapter.WtForecastAdapter;
-import com.example.weatherfa.adapter.WtHistoryAdapter;
 import com.example.weatherfa.adapter.WtLifeIndexAdapter;
 import com.example.weatherfa.gson.FutureEDay;
+import com.example.weatherfa.historyActivity.HWtStatisticsActivity;
 import com.example.weatherfa.service.AutoUpdateService;
 import com.example.weatherfa.wtclass.WtDetail;
 import com.example.weatherfa.adapter.WtDetailAdapter;
@@ -37,7 +33,6 @@ import com.example.weatherfa.gson.Weather;
 import com.example.weatherfa.util.HttpUtil;
 import com.example.weatherfa.util.Utility;
 import com.example.weatherfa.wtclass.WtForecast;
-import com.example.weatherfa.wtclass.WtHistory;
 import com.example.weatherfa.wtclass.WtLifeIndex;
 
 import org.jetbrains.annotations.NotNull;
@@ -68,9 +63,8 @@ public class WeatherFragment extends Fragment{
     private RecyclerView forecastRV;
     private List<WtLifeIndex> wtLifeIndexList=new ArrayList<>(); //生活指数
     private RecyclerView lifeIndexRV;
-    private List<WtHistory> wtHistoryList=new ArrayList<>();   //历史天气
-    private RecyclerView historyRV;
-    private Button wtFullsBT;
+    private ImageView hIM0,hIM1;//历史天气2
+    private Button hFullsBT0,hFullsBT1;
     private LinearLayout WtLO;//整体布局
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -87,9 +81,12 @@ public class WeatherFragment extends Fragment{
         detailRV= root.findViewById(R.id.detail_recycler_view);//-------detail
         forecastRV= root.findViewById(R.id.forecast_recycler_view);//------forecast
         lifeIndexRV= root.findViewById(R.id.life_index_recycler_view);//------lifeindex
-        historyRV=root.findViewById(R.id.history_recycler_view);//-----history
+        hIM0=root.findViewById(R.id.h_item_icon_iv0);//========history
+        hIM1=root.findViewById(R.id.h_item_icon_iv1);
+        hFullsBT0=root.findViewById(R.id.h_item_fulls_bt0);
+        hFullsBT1=root.findViewById(R.id.h_item_fulls_bt1);
+
         WtLO=root.findViewById(R.id.wt_layout);
-        wtFullsBT=root.findViewById(R.id.h_item_fulls_bt);
 
         sp= this.getActivity().getSharedPreferences("weatherfa",this.getActivity().MODE_PRIVATE);
         editor=sp.edit();
@@ -107,20 +104,10 @@ public class WeatherFragment extends Fragment{
         }else{//无缓存时去服务器查询天气
             requestWeather(cityName);
         }
-        //temp，历史天气分析界面
-        WtHistory hist1=new WtHistory(R.drawable.h_fullscreen,R.drawable.h_line,"温度变化分析");
-        wtHistoryList.add(hist1);
-        WtHistory hist2=new WtHistory(R.drawable.h_fullscreen,R.drawable.h_histogram,"天气情况分析");
-        wtHistoryList.add(hist2);
-        historyRV.setNestedScrollingEnabled(false);//禁止滑动
-        historyRV.setLayoutManager(new GridLayoutManager(getActivity(), 2));//GridLayout
-        WtHistoryAdapter adapter0=new WtHistoryAdapter(wtHistoryList);
-        historyRV.setAdapter(adapter0);
-     /*   wtFullsBT.setOnClickListener(v -> {
-            Toast.makeText(getActivity(),"按了按钮",Toast.LENGTH_SHORT).show();
-                });
-
-      */
+        //历史天气分析界面
+        hIM0.setImageResource(R.drawable.h_line);
+        hIM1.setImageResource(R.drawable.h_histogram);
+        setOnClickListener();
         //下拉刷新响应
         swipeRefreshLO.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -130,6 +117,23 @@ public class WeatherFragment extends Fragment{
         });
         return root;
     }
+    //历史天气按钮的响应
+    private void setOnClickListener(){
+        hFullsBT0.setOnClickListener(this::onClick);
+        hFullsBT1.setOnClickListener(this::onClick);
+    }
+    private void onClick(View v) {
+        switch (v.getId()){
+            case R.id.h_item_fulls_bt0:
+                Toast.makeText(getActivity(),"第一个按钮",Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.h_item_fulls_bt1://跳转，历史天气统计
+                Intent intent = new Intent(getActivity(), HWtStatisticsActivity.class);
+                startActivity(intent);
+                Toast.makeText(getActivity(),"第二个按钮",Toast.LENGTH_SHORT).show();
+        }
+    }
+
     //根据城市名请求城市天气信息
     private void requestWeather(final String cityName){
         //拼装接口地址

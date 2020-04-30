@@ -18,6 +18,7 @@
             android:orientation="vertical">
 
             <androidx.cardview.widget.CardView
+                android:id="@+id/now_card_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
@@ -88,6 +89,7 @@
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
+                android:id="@+id/detail_card_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
@@ -122,6 +124,7 @@
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
+                android:id="@+id/forecast_card_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
@@ -191,36 +194,109 @@
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
-                android:id="@+id/history_card_view"
+                android:id="@+id/history_card_view2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="8dp"
                 android:layout_marginRight="10dp"
                 android:layout_marginBottom="4dp"
                 app:cardElevation="1dp"
-                app:contentPadding="8dp">
-
+                app:contentPadding="8dp" >
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:descendantFocusability="blocksDescendants">
-
                     <TextView
-                        android:id="@+id/history_title"
+                        android:id="@+id/history_title2"
                         android:layout_width="match_parent"
                         android:layout_height="42dp"
                         android:text="历史天气"
                         android:textSize="18sp" />
 
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/history_recycler_view"
+                    <androidx.gridlayout.widget.GridLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_below="@id/history_title"
-                        android:layout_marginTop="12dp"
-                        android:layout_marginBottom="4dp"
-                        tools:listitem="@layout/wt_lifeindex_item" />
+                        android:layout_below="@id/history_title2">
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="?android:attr/selectableItemBackground"
+                            android:orientation="vertical"
+                            android:padding="8dp"
+                            app:layout_columnWeight="1">
+
+                            <Button
+                                android:id="@+id/h_item_fulls_bt0"
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_gravity="top|end"
+                                android:background="@drawable/h_fullscreen"
+                                android:contentDescription="@string/content_description_default"
+                                android:scaleType="fitXY" />
+
+                            <ImageView
+                                android:id="@+id/h_item_icon_iv0"
+                                android:layout_width="65dp"
+                                android:layout_height="80dp"
+                                android:layout_gravity="center_horizontal"
+                                android:contentDescription="@string/content_description_default"
+                                android:scaleType="fitXY"
+                                tools:srcCompat="@drawable/h_line" />
+
+                            <TextView
+                                android:id="@+id/h_item_type_tv0"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_horizontal"
+                                android:layout_marginTop="4dp"
+                                android:lines="1"
+                                android:text="@string/h_line"
+                                android:textSize="@dimen/text_size_caption" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="?android:attr/selectableItemBackground"
+                            android:orientation="vertical"
+                            android:padding="8dp"
+                            app:layout_columnWeight="1">
+
+                            <Button
+                                android:id="@+id/h_item_fulls_bt1"
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_gravity="top|end"
+                                android:background="@drawable/h_fullscreen"
+                                android:contentDescription="@string/content_description_default"
+                                android:scaleType="fitXY" />
+
+                            <ImageView
+                                android:id="@+id/h_item_icon_iv1"
+                                android:layout_width="65dp"
+                                android:layout_height="80dp"
+                                android:layout_gravity="center_horizontal"
+                                android:contentDescription="@string/content_description_default"
+                                android:scaleType="fitXY"
+                                tools:srcCompat="@drawable/h_histogram" />
+
+                            <TextView
+                                android:id="@+id/h_item_type_tv1"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_horizontal"
+                                android:layout_marginTop="4dp"
+                                android:lines="1"
+                                android:text="@string/h_histogram"
+                                android:textSize="@dimen/text_size_caption" />
+
+                        </LinearLayout>
+
+                    </androidx.gridlayout.widget.GridLayout>
+
                 </RelativeLayout>
 
             </androidx.cardview.widget.CardView>
