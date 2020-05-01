@@ -8,4 +8,12 @@
     <color name="colorGreen">#13D1BE</color>
     <color name="white">#ffffff</color>
 
+    <!--折线图-->
+    <color name="blue_line">#98d6ea</color>
+    <color name="blue_point">#00bcd4</color>
+    <color name="red_line">#f64b3c</color>
+    <color name="red_point">#dd2c00</color>
+    <color name="yellow_line">#ffe75e</color>
+    <color name="yellow_point">#f8b400</color>
+
 </resources>

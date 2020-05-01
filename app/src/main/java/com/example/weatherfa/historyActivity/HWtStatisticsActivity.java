@@ -176,10 +176,12 @@ public class HWtStatisticsActivity extends AppCompatActivity {
                                      */
                                     JSONArray ResultJSONArray = jsonObject.getJSONArray("result");
                                     ArrayList<BarEntry> yVals = new ArrayList<>();
-                                    String[] xValues = new String[20];
+                                    ArrayList<String> xValues=new ArrayList<>();
+                                    //String[] xValues = new String[20];
                                     for (int i = 0; i < ResultJSONArray.length(); i++) {
                                         JSONObject resultJSONObject = ResultJSONArray.getJSONObject(i);
-                                        xValues[i] = resultJSONObject.getString("xdata");
+                                        //xValues[i] = resultJSONObject.getString("xdata");
+                                        xValues.add(resultJSONObject.getString("xdata"));
                                         //BarEntry(x轴index，y轴对应数值)
                                         yVals.add(new BarEntry(i, resultJSONObject.getInt("ydata")));
                                     }
@@ -240,12 +242,12 @@ public class HWtStatisticsActivity extends AppCompatActivity {
     private String nowTime() {
         @SuppressLint("SimpleDateFormat") SimpleDateFormat simpleDateFormat =
                 new SimpleDateFormat("yyyy-MM-dd");// HH:mm:ss
-        Date date = new Date(System.currentTimeMillis());
+        Date date = new Date(System.currentTimeMillis()-24*60*60*1000);
         return simpleDateFormat.format(date);
     }
 
     //绘制柱状图（total-数值，weathertype-名称）
-    public void drawChart(ArrayList<BarEntry> yVals, String[] xValues) {
+    public void drawChart(ArrayList<BarEntry> yVals, ArrayList<String> xValues) {
 
         BarDataSet set1;
         set1 = new BarDataSet(yVals, "weather type");//初始化柱状图数据源（单柱状图，未设置显示）
@@ -270,15 +272,15 @@ public class HWtStatisticsActivity extends AppCompatActivity {
 
     //自定义x轴的名称显示
     public static class XAxisValueFormatter implements IAxisValueFormatter {
-        private String[] xValues;
+        private ArrayList<String> xValues;
 
-        public XAxisValueFormatter(String[] xValues) {
+        public XAxisValueFormatter(ArrayList<String> xValues) {
             this.xValues = xValues;
         }
 
         @Override
         public String getFormattedValue(float value, AxisBase axis) {
-            return xValues[(int) value];
+            return xValues.get((int) value);
         }
     }
 

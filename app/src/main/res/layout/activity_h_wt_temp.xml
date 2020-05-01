@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:text="点击选择起始日期" />
+        android:text="@string/query_bt" />
 
     <com.github.mikephil.charting.charts.LineChart
         android:id="@+id/chart1"

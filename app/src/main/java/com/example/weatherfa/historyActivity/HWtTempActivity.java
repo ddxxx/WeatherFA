@@ -1,3 +1,10 @@
+/*
+历史天气分析之某一城市某一时间段内历史温度变化趋势的折线图：
+
+从sp中读取天气页当前选择的城市，
+点击按钮选择起始和终止日期，点击确定后，将（城市，起始日期，终止日期）作为url参数参入，
+响应为（ydata,ydata1,ydata2,xdata）->(最高温，最低温，温差，日期)，日期做x轴，绘制三条折线
+ */
 package com.example.weatherfa.historyActivity;
 
 import androidx.annotation.NonNull;
@@ -21,33 +28,23 @@ import android.widget.Toast;
 import com.example.weatherfa.R;
 import com.example.weatherfa.constant.NetConstant;
 import com.fantasy.doubledatepicker.DoubleDateSelectDialog;
-import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
-import com.github.mikephil.charting.data.BarData;
-import com.github.mikephil.charting.data.BarDataSet;
-import com.github.mikephil.charting.data.BarEntry;
-import com.github.mikephil.charting.data.DataSet;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.github.mikephil.charting.formatter.LargeValueFormatter;
-import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
-import com.github.mikephil.charting.interfaces.datasets.IDataSet;
-import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.utils.ColorTemplate;
-import com.google.android.material.bottomappbar.BottomAppBar;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.lang.reflect.Parameter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -68,7 +65,7 @@ public class HWtTempActivity extends AppCompatActivity {
     private Button mShowDatePickBtn;    //日期选择按钮
     private DoubleDateSelectDialog mDoubleTimeSelectDialog;
     private String allowedSmallestTime, allowedBiggestTime, defaultChooseDate;  //允许的起、止日期，默认选中日期
-    //柱状图相关变量
+    //折线图相关变量
     private LineChart chart;
     private XAxis xAxis;
     private YAxis yAxis;
@@ -112,7 +109,6 @@ public class HWtTempActivity extends AppCompatActivity {
             }
         });
         //折线图相关属性设置
-        //chart.setOnChartValueSelectedListener(this);
         chart.setNoDataText("当前未查看任何历史数据");//设置空数据时的显示文本
         chart.setDrawGridBackground(true);
         chart.getDescription().setEnabled(false);
@@ -130,46 +126,24 @@ public class HWtTempActivity extends AppCompatActivity {
         // if disabled, scaling can be done on x- and y-axis separately
         chart.setPinchZoom(false);
         //设置图表绘制可见标签数量的最大值
-        //chart.setMaxVisibleValueCount(50);
 
-        //x
+        //x轴相关设置（显示日期）
         xAxis = chart.getXAxis();
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         xAxis.setDrawGridLines(false);
- //       xAxis.setLabelRotationAngle(60);//旋转角度以免重叠
         chart.getAxisLeft().setDrawGridLines(false);
-//
-//        xAxis = chart.getXAxis();
-//        //xAxis.setTypeface(tfLight);
-//        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-//        xAxis.setTextSize(11f);
-//        xAxis.setTextColor(R.color.black33);
-//        xAxis.setDrawGridLines(false);
-//        xAxis.setDrawAxisLine(false);
-
+        //y轴相关设置
         YAxis leftAxis = chart.getAxisLeft();
-//        //leftAxis.setTypeface(tfLight);
-//        leftAxis.setTextColor(ColorTemplate.getHoloBlue());
-//        leftAxis.setAxisMaximum(50f);
-//        leftAxis.setAxisMinimum(-30f);
-        leftAxis.setDrawGridLines(true);
-//        leftAxis.setGranularityEnabled(true);
+        leftAxis.setDrawGridLines(true);//绘制横向格线
 
-        //动画相关设置 add a nice and smooth animation
-        //chart.animateY(1500);
+        //折线示意部分的相关设置
         Legend l = chart.getLegend();
         l.setForm(Legend.LegendForm.LINE);
-        //l.setTypeface(tfLight);
         l.setTextSize(11f);
-        l.setTextColor(R.color.colorRed);
         l.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM);
         l.setHorizontalAlignment(Legend.LegendHorizontalAlignment.LEFT);
-        l.setOrientation(Legend.LegendOrientation.HORIZONTAL);
-        l.setDrawInside(false);
-//        l.setVerticalAlignment(Legend.LegendVerticalAlignment.TOP);
-//        l.setHorizontalAlignment(Legend.LegendHorizontalAlignment.RIGHT);
-//        l.setOrientation(Legend.LegendOrientation.VERTICAL);
-//        l.setDrawInside(false);
+        l.setOrientation(Legend.LegendOrientation.HORIZONTAL);//不可修改为Vertical，会显示在折线图左侧
+        l.setDrawInside(false);//在折线图外部绘制
     }
 
     /*
@@ -220,28 +194,21 @@ public class HWtTempActivity extends AppCompatActivity {
                                 JSONObject jsonObject = new JSONObject(responseBodyStr);//获得JSONBObject对象
                                 int success = jsonObject.getInt("success");
                                 if (success == 200) {
-                                    /*
-                                    将response的result中的weathertype放入String数组（用于x轴名称显示），
-                                    total作为柱状图数值
-                                     */
+                                    //处理result
                                     JSONArray ResultJSONArray = jsonObject.getJSONArray("result");
                                     ArrayList<Entry> entries = new ArrayList<>();
                                     ArrayList<Entry> entries1 = new ArrayList<>();
                                     ArrayList<Entry> entries2 = new ArrayList<>();
-                                    //ArrayList<Entry> xVals =new ArrayList<>();
                                     ArrayList<String> xValues =new ArrayList<>();
-                                    //String[] xValues = new String[20];
                                     for (int i = 0; i < ResultJSONArray.length(); i++) {
                                         JSONObject resultJSONObject = ResultJSONArray.getJSONObject(i);
                                         xValues.add(resultJSONObject.getString("xdata"));
-                                        //xValues[i] = resultJSONObject.getString("xdata");
                                         //Entry(x轴index，y轴对应数值),要求是float，需自定义设配器
-                                        String xdata=resultJSONObject.getString("xdata").replace("-","");
-                                        Log.e("show xdata:",String.valueOf(i)+"  "+xdata);
                                         entries.add(new Entry(i, resultJSONObject.getInt("ydata")));
-
+                                        entries1.add(new Entry(i,resultJSONObject.getInt("ydata1")));
+                                        entries2.add(new Entry(i,resultJSONObject.getInt("ydata2")));
                                     }
-                                    drawChart(entries,xValues);//绘制柱状图函数
+                                    drawChart(entries,entries1,entries2,xValues);//绘制柱状图函数
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
@@ -294,7 +261,7 @@ public class HWtTempActivity extends AppCompatActivity {
         }
     }
 
-    //获取当前系统时间，用于提示更新时间
+    //获取当前系统时间的前一天，用于日期选择dialog的默认选中日期
     private String nowTime() {
         @SuppressLint("SimpleDateFormat") SimpleDateFormat simpleDateFormat =
                 new SimpleDateFormat("yyyy-MM-dd");// HH:mm:ss
@@ -302,44 +269,60 @@ public class HWtTempActivity extends AppCompatActivity {
         return simpleDateFormat.format(date);
     }
 
-    //绘制柱状图（total-数值，weathertype-名称）
-    public void drawChart(ArrayList<Entry> entries,ArrayList<String> xValues) {
+    //绘制折线图（最高温，最低温，温差，日期）
+    public void drawChart(ArrayList<Entry> entries,
+                          ArrayList<Entry> entries1,
+                          ArrayList<Entry> entries2,
+                          ArrayList<String> xValues) {
 
-        LineDataSet set1;
-        set1 = new LineDataSet(entries, "最高温度");//初始化柱状图数据源（单柱状图，未设置显示）
+        LineDataSet set0,set1,set2;
+        set0 = new LineDataSet(entries, "最高温度");//初始化柱状图数据源（单柱状图，未设置显示）
+        set0.setAxisDependency(YAxis.AxisDependency.LEFT);
+        set0.setColor(Color.rgb(255,140,157));
+        set0.setCircleColor(Color.rgb(255,140,157));
+        set0.setLineWidth(2f);
+        set0.setCircleRadius(3f);
+        set0.setFillAlpha(65);
+        set0.setFillColor(Color.rgb(255,140,157));
+        set0.setHighLightColor(Color.rgb(244, 117, 117));
+        set0.setDrawCircleHole(false);
+        set0.setDrawValues(true);
+
+        set1 = new LineDataSet(entries1, "最低温度");//初始化柱状图数据源（单柱状图，未设置显示）
         set1.setAxisDependency(YAxis.AxisDependency.LEFT);
-        set1.setColor(ColorTemplate.getHoloBlue());
-        set1.setCircleColor(R.color.colorRed);
+        set1.setColor(Color.rgb(140,234,255));
+        set1.setCircleColor(Color.rgb(140,234,255));
         set1.setLineWidth(2f);
         set1.setCircleRadius(3f);
         set1.setFillAlpha(65);
-        set1.setFillColor(ColorTemplate.getHoloBlue());
+        set1.setFillColor(Color.rgb(140,234,255));
         set1.setHighLightColor(Color.rgb(244, 117, 117));
         set1.setDrawCircleHole(false);
         set1.setDrawValues(true);
 
+        set2 = new LineDataSet(entries2, "每日温差");//初始化柱状图数据源（单柱状图，未设置显示）
+        set2.setAxisDependency(YAxis.AxisDependency.LEFT);
+        set2.setColor(Color.rgb(255,208,140));
+        set2.setCircleColor(Color.rgb(255,208,140));
+        set2.setLineWidth(2f);
+        set2.setCircleRadius(3f);
+        set2.setFillAlpha(65);
+        set2.setFillColor(Color.rgb(255,208,140));
+        set2.setHighLightColor(Color.rgb(244, 117, 117));
+        set2.setDrawCircleHole(false);
+        set2.setDrawValues(true);
 
-        //set1.setValueTextSize(13f);
         //x轴数据设置
-        //xAxis.setLabelCount(xValues.size(),true); //设置true会位置错乱
         xAxis.setLabelCount(xValues.size());
-        xAxis.setGranularity(1);     //这个很重要
+        xAxis.setGranularity(1);     //这个很重要，解决x轴名称和折线点对应错位问题
         xAxis.setDrawLabels(true);
-        //xAxis.setTextSize(13f);
         IAxisValueFormatter iAxisValueFormatter = new XAxisValueFormatter(xValues);
         xAxis.setValueFormatter(iAxisValueFormatter);
         xAxis.setLabelRotationAngle(90);
-        //xAxis.setXOffset();
 
-
-
-
-//        ArrayList<ILineDataSet> dataSets = new ArrayList<>();
-//        dataSets.add(set1);
-        LineData data = new LineData(set1);
+        LineData data = new LineData(set0,set1,set2);
         data.setValueFormatter(new LargeValueFormatter("℃"));
         chart.setData(data);
-        //chart.setFitBars(true);
         chart.invalidate();
     }
 
@@ -349,17 +332,9 @@ public class HWtTempActivity extends AppCompatActivity {
         public XAxisValueFormatter(ArrayList<String> xValues){
             this.xValues=xValues;
         }
-//        private String[] xValues;
-
-//        public XAxisValueFormatter(String[] xValues) {
-//            this.xValues = xValues;
-//        }
-
         @Override
         public String getFormattedValue(float value, AxisBase axis) {
-            Log.e("value=",String.valueOf(value));
             return xValues.get((int)value);
-         //   return xValues[(int) value];
         }
     }
 
