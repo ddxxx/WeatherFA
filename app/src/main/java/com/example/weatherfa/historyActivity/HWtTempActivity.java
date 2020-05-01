@@ -185,11 +185,11 @@ public class HWtTempActivity extends AppCompatActivity {
                     public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                         // 先判断一下服务器是否异常
                         String responseStr = response.toString();
-                        Log.e("Hweather", responseStr);
+                        //Log.e("Hweather", responseStr);
                         if (responseStr.contains("200")) {
                             // response.body().string()只能调用一次，多次调用会报错
                             String responseBodyStr = Objects.requireNonNull(response.body()).string();
-                            Log.e("fanhui",responseBodyStr);
+                            //Log.e("fanhui",responseBodyStr);
                             try {
                                 JSONObject jsonObject = new JSONObject(responseBodyStr);//获得JSONBObject对象
                                 int success = jsonObject.getInt("success");
@@ -208,13 +208,18 @@ public class HWtTempActivity extends AppCompatActivity {
                                         entries1.add(new Entry(i,resultJSONObject.getInt("ydata1")));
                                         entries2.add(new Entry(i,resultJSONObject.getInt("ydata2")));
                                     }
-                                    drawChart(entries,entries1,entries2,xValues);//绘制柱状图函数
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            drawChart(entries,entries1,entries2,xValues);//绘制柱状图函数
+                                        }
+                                    });
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
                         } else {
-                            Log.e("Hweather", "服务器异常");
+                            //Log.e("Hweather", "服务器异常");
                             showToastInThread(HWtTempActivity.this, responseStr);
                         }
                     }

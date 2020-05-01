@@ -105,6 +105,7 @@ public class HWtStatisticsActivity extends AppCompatActivity {
             }
         });
         //柱状图相关属性设置
+        chart.setNoDataText("当前未查看任何历史数据");//设置空数据时的显示文本
         chart.getDescription().setEnabled(false);
         chart.setMaxVisibleValueCount(60);// 柱条超过60时不会再编注数值
         chart.setPinchZoom(false);// false只能x或y方向放大
@@ -185,7 +186,12 @@ public class HWtStatisticsActivity extends AppCompatActivity {
                                         //BarEntry(x轴index，y轴对应数值)
                                         yVals.add(new BarEntry(i, resultJSONObject.getInt("ydata")));
                                     }
-                                    drawChart(yVals, xValues);//绘制柱状图函数
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            drawChart(yVals, xValues);//绘制柱状图函数
+                                        }
+                                    });
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
