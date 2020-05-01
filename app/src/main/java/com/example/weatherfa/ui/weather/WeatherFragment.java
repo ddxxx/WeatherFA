@@ -26,6 +26,7 @@ import com.example.weatherfa.adapter.WtForecastAdapter;
 import com.example.weatherfa.adapter.WtLifeIndexAdapter;
 import com.example.weatherfa.gson.FutureEDay;
 import com.example.weatherfa.historyActivity.HWtStatisticsActivity;
+import com.example.weatherfa.historyActivity.HWtTempActivity;
 import com.example.weatherfa.service.AutoUpdateService;
 import com.example.weatherfa.wtclass.WtDetail;
 import com.example.weatherfa.adapter.WtDetailAdapter;
@@ -125,11 +126,13 @@ public class WeatherFragment extends Fragment{
     private void onClick(View v) {
         switch (v.getId()){
             case R.id.h_item_fulls_bt0:
+                Intent intent0 = new Intent(getActivity(), HWtTempActivity.class);
+                startActivity(intent0);
                 Toast.makeText(getActivity(),"第一个按钮",Toast.LENGTH_SHORT).show();
                 break;
             case R.id.h_item_fulls_bt1://跳转，历史天气统计
-                Intent intent = new Intent(getActivity(), HWtStatisticsActivity.class);
-                startActivity(intent);
+                Intent intent1 = new Intent(getActivity(), HWtStatisticsActivity.class);
+                startActivity(intent1);
                 Toast.makeText(getActivity(),"第二个按钮",Toast.LENGTH_SHORT).show();
         }
     }
