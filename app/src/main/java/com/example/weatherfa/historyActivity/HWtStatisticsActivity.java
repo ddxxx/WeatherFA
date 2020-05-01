@@ -109,8 +109,8 @@ public class HWtStatisticsActivity extends AppCompatActivity {
         chart.getDescription().setEnabled(false);
         chart.setMaxVisibleValueCount(60);// 柱条超过60时不会再编注数值
         chart.setPinchZoom(false);// false只能x或y方向放大
-        chart.setDrawBarShadow(false);
         chart.setDrawGridBackground(false);
+        chart.setDrawBarShadow(false);
         //x轴名称相关属性设置
         xAxis = chart.getXAxis();
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
