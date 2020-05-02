@@ -1,8 +1,14 @@
 package com.example.weatherfa.ui.weather;
 
 import android.annotation.SuppressLint;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.BitmapFactory;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,18 +21,21 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.app.NotificationCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.example.weatherfa.MainActivity;
 import com.example.weatherfa.R;
 import com.example.weatherfa.adapter.WtForecastAdapter;
 import com.example.weatherfa.adapter.WtLifeIndexAdapter;
 import com.example.weatherfa.gson.FutureEDay;
 import com.example.weatherfa.historyActivity.HWtStatisticsActivity;
 import com.example.weatherfa.historyActivity.HWtTempActivity;
+import com.example.weatherfa.historyActivity.HWtWindActivity;
 import com.example.weatherfa.service.AutoUpdateService;
 import com.example.weatherfa.wtclass.WtDetail;
 import com.example.weatherfa.adapter.WtDetailAdapter;
@@ -49,6 +58,8 @@ import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
 
+import static android.content.Context.NOTIFICATION_SERVICE;
+
 
 public class WeatherFragment extends Fragment{
     public SwipeRefreshLayout swipeRefreshLO;  //下拉更新
@@ -64,8 +75,8 @@ public class WeatherFragment extends Fragment{
     private RecyclerView forecastRV;
     private List<WtLifeIndex> wtLifeIndexList=new ArrayList<>(); //生活指数
     private RecyclerView lifeIndexRV;
-    private ImageView hIM0,hIM1;//历史天气2
-    private Button hFullsBT0,hFullsBT1;
+    private ImageView hIM0,hIM1,hIM2;//历史天气2
+    private Button hFullsBT0,hFullsBT1,hFullsBT2;
     private LinearLayout WtLO;//整体布局
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -84,8 +95,10 @@ public class WeatherFragment extends Fragment{
         lifeIndexRV= root.findViewById(R.id.life_index_recycler_view);//------lifeindex
         hIM0=root.findViewById(R.id.h_item_icon_iv0);//========history
         hIM1=root.findViewById(R.id.h_item_icon_iv1);
+        hIM2=root.findViewById(R.id.h_item_icon_iv2);
         hFullsBT0=root.findViewById(R.id.h_item_fulls_bt0);
         hFullsBT1=root.findViewById(R.id.h_item_fulls_bt1);
+        hFullsBT2=root.findViewById(R.id.h_item_fulls_bt2);
 
         WtLO=root.findViewById(R.id.wt_layout);
 
@@ -108,6 +121,8 @@ public class WeatherFragment extends Fragment{
         //历史天气分析界面
         hIM0.setImageResource(R.drawable.h_line);
         hIM1.setImageResource(R.drawable.h_histogram);
+        hIM2.setImageResource(R.drawable.pie_chart);
+
         setOnClickListener();
         //下拉刷新响应
         swipeRefreshLO.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -122,18 +137,21 @@ public class WeatherFragment extends Fragment{
     private void setOnClickListener(){
         hFullsBT0.setOnClickListener(this::onClick);
         hFullsBT1.setOnClickListener(this::onClick);
+        hFullsBT2.setOnClickListener(this::onClick);
     }
     private void onClick(View v) {
         switch (v.getId()){
             case R.id.h_item_fulls_bt0:
                 Intent intent0 = new Intent(getActivity(), HWtTempActivity.class);
                 startActivity(intent0);
-                Toast.makeText(getActivity(),"第一个按钮",Toast.LENGTH_SHORT).show();
                 break;
             case R.id.h_item_fulls_bt1://跳转，历史天气统计
                 Intent intent1 = new Intent(getActivity(), HWtStatisticsActivity.class);
                 startActivity(intent1);
-                Toast.makeText(getActivity(),"第二个按钮",Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.h_item_fulls_bt2://跳转，历史天气统计
+                Intent intent2 = new Intent(getActivity(), HWtWindActivity.class);
+                startActivity(intent2);
         }
     }
 
@@ -164,6 +182,7 @@ public class WeatherFragment extends Fragment{
 
                             showWeatherInfo(weather);
                             Toast.makeText(getActivity(),"获取天气信息成功",Toast.LENGTH_SHORT).show();
+                            //notifyWeatherInfo();
                             swipeRefreshLO.setRefreshing(false);
                         }
                         else{
@@ -204,10 +223,10 @@ public class WeatherFragment extends Fragment{
         String sIcon="d"+weather.result.realTime.wtIcon;
         nowIconIV.setImageResource(imageId(sIcon));
         nowWmdTV.setText(weather.result.realTime.week);//只显示周几
-        String sCity=weather.result.county;
-
         nowCityTV.setText(cityName);
-        String sTt=weather.result.realTime.wtType+"  "+weather.result.realTime.wtTemp+"℃";
+        String wtType=weather.result.realTime.wtType;
+        String wtTemp=weather.result.realTime.wtTemp;
+        String sTt=wtType+"  "+wtTemp+"℃";
         nowTtTV.setText(sTt);
         //----------detail
         wtDetailList.clear();
@@ -259,9 +278,47 @@ public class WeatherFragment extends Fragment{
         WtLifeIndexAdapter adapter3=new WtLifeIndexAdapter(wtLifeIndexList);
         lifeIndexRV.setAdapter(adapter3);
 
+        //通知栏提示相关信息
+        notifyWeatherInfo(cityName,wtType,wtTemp);
         //后台自动更新
         WtLO.setVisibility(View.VISIBLE);
         Intent intent=new Intent(getActivity(), AutoUpdateService.class);
         getActivity().startService(intent);
+    }
+
+    private void notifyWeatherInfo(String cityname,String wttype,String wttemp) {
+        String channelId = "notification_simple";
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+
+            NotificationManager manager = (NotificationManager) getActivity().getSystemService(NOTIFICATION_SERVICE);
+            NotificationChannel channel = new NotificationChannel(channelId, "simple", NotificationManager.IMPORTANCE_DEFAULT);
+            manager.createNotificationChannel(channel);
+            Intent intent =new Intent (getActivity(),MainActivity.class);
+            PendingIntent pendingIntent =PendingIntent.getBroadcast(getActivity(), 0, intent, 0);
+
+            Notification notification = new NotificationCompat.Builder(getActivity(), channelId)
+                    .setContentTitle(cityname+"-天气信息更新成功")
+                    .setContentText("实时天气："+wttype+"\n实时温度："+wttemp+"℃")
+                    .setWhen(System.currentTimeMillis())
+                    .setSmallIcon(R.mipmap.ic_launcher)
+                    .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher))
+                    .setContentIntent(pendingIntent)
+                    .build();
+            manager.notify(1, notification);
+        } else {
+            NotificationManager manager = (NotificationManager) getActivity().getSystemService(NOTIFICATION_SERVICE);
+            Intent intent =new Intent (getActivity(),MainActivity.class);
+            PendingIntent pendingIntent =PendingIntent.getBroadcast(getActivity(), 0, intent, 0);
+
+            Notification notification = new NotificationCompat.Builder(getActivity(), channelId)
+                    .setContentTitle("天气信息更新成功")
+                    .setContentText("实时天气："+wttype+"   实时温度："+wttemp+"℃")
+                    .setWhen(System.currentTimeMillis())
+                    .setSmallIcon(R.mipmap.ic_launcher)
+                    .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher))
+                    .setContentIntent(pendingIntent)
+                    .build();
+            manager.notify(1, notification);
+        }
     }
 }

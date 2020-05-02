@@ -92,5 +92,7 @@
     <string name="query_bt">点击选择起止日期</string>
     <string name="to">至</string>
     <string name="save_item">存储至相册</string>
+    <string name="change_type1">查看风力</string>
+    <string name="change_type2">查看风向</string>
 
 </resources>

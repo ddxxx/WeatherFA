@@ -102,7 +102,7 @@ public class HWtTempActivity extends AppCompatActivity {
         mShowDatePickBtn = findViewById(R.id.query_bt);
         chart = findViewById(R.id.chart1);
         //设置“选择日期”的起、止、默认选中日期，格式：yyyy-MM-dd
-        allowedSmallestTime = "2018-01-01";
+        allowedSmallestTime = "2016-01-01";
         allowedBiggestTime = nowTime();
         defaultChooseDate = nowTime();
         //选择日期按钮的响应事件

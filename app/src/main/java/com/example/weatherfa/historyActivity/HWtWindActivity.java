@@ -1,10 +1,11 @@
 /*
-历史天气分析之某一城市某一时间段内天气类型统计的柱状图：
+历史天气分析之某一城市某一时间段内历史温度变化趋势的折线图：
 
 从sp中读取天气页当前选择的城市，
 点击按钮选择起始和终止日期，点击确定后，将（城市，起始日期，终止日期）作为url参数参入，
-响应为（weathertype，total），weathertype作为x轴名称，total作为柱状图数值
+响应为（ydata,ydata1,ydata2,xdata）->(最高温，最低温，温差，日期)，日期做x轴，绘制三条折线
  */
+
 package com.example.weatherfa.historyActivity;
 
 import androidx.annotation.NonNull;
@@ -14,8 +15,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -25,29 +26,37 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.example.weatherfa.MainActivity;
 import com.example.weatherfa.R;
 import com.example.weatherfa.constant.NetConstant;
 import com.fantasy.doubledatepicker.DoubleDateSelectDialog;
-import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.animation.Easing;
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.components.AxisBase;
+import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
-import com.github.mikephil.charting.data.BarData;
-import com.github.mikephil.charting.data.BarDataSet;
-import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.data.PieData;
+import com.github.mikephil.charting.data.PieDataSet;
+import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.github.mikephil.charting.formatter.LargeValueFormatter;
-import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
+import com.github.mikephil.charting.formatter.PercentFormatter;
 import com.github.mikephil.charting.utils.ColorTemplate;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Objects;
+
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.MediaType;
@@ -56,16 +65,18 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class HWtStatisticsActivity extends AppCompatActivity {
+public class HWtWindActivity extends AppCompatActivity {
+    private String flag="3";//3:风向，4:风力
     //准备存储从sp获得的城市名
     private String cityName;
     //日期选择相关变量
     private Button mShowDatePickBtn;    //日期选择按钮
     private DoubleDateSelectDialog mDoubleTimeSelectDialog;
     private String allowedSmallestTime, allowedBiggestTime, defaultChooseDate;  //允许的起、止日期，默认选中日期
-    //柱状图相关变量
-    private BarChart chart;
+    //饼状图相关变量
+    private PieChart chart;
     private XAxis xAxis;
+    private YAxis yAxis;
     //用于控制GSON request的编码格式
     public static final MediaType FORM_CONTENT_TYPE
             = MediaType.parse("application/x-www-form-urlencoded; charset=utf-8");
@@ -75,12 +86,12 @@ public class HWtStatisticsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);// 去除顶部状态栏
-        setContentView(R.layout.activity_h_wt_statistics);
+        setContentView(R.layout.activity_h_wt_wind);
         //获取当前城市名称
         SharedPreferences sp = this.getSharedPreferences("weatherfa", MODE_PRIVATE);
         cityName = sp.getString("cityname", "东平");
         //标题栏相关设置
-        setTitle(cityName + "-历史天气统计");//名称
+        setTitle(cityName + "-历史风向/风力统计");//名称
         ActionBar actionBar = getSupportActionBar();//添加返回键
         if (actionBar != null) {
             actionBar.setHomeButtonEnabled(true);
@@ -109,22 +120,41 @@ public class HWtStatisticsActivity extends AppCompatActivity {
                 showCustomTimePicker();//（函数）显示选择日期的dialog
             }
         });
-        //柱状图相关属性设置
-        chart.setNoDataText("当前未查看任何历史数据");//设置空数据时的显示文本
+        //饼状图相关属性设置
+        chart.setNoDataText("选择日期后查看历史风向统计");//设置空数据时的显示文本
+        chart.setUsePercentValues(true);
         chart.getDescription().setEnabled(false);
-        chart.setMaxVisibleValueCount(60);// 柱条超过60时不会再编注数值
-        chart.setPinchZoom(false);// false只能x或y方向放大
-        chart.setDrawGridBackground(false);
-        chart.setDrawBarShadow(false);
-        //x轴名称相关属性设置
-        xAxis = chart.getXAxis();
-        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-        xAxis.setDrawGridLines(false);
-        xAxis.setLabelRotationAngle(60);//旋转角度以免重叠
-        chart.getAxisLeft().setDrawGridLines(false);
-        //动画相关设置 add a nice and smooth animation
-        //chart.animateY(1500);
-        chart.getLegend().setEnabled(false);
+        chart.setExtraOffsets(5, 10, 5, 5);
+        chart.setDragDecelerationFrictionCoef(0.95f);
+        chart.setTransparentCircleRadius(48f);// 半透明圈
+        chart.setDrawCenterText(true);//饼状图中间可以添加文字
+        chart.setHoleColor(Color.WHITE);
+        chart.setCenterText("当前查看：历史风向统计");
+        chart.setTransparentCircleColor(Color.WHITE);
+        chart.setTransparentCircleAlpha(110);
+        chart.setHoleRadius(58f);
+        chart.setTransparentCircleRadius(61f);
+        chart.setDrawCenterText(true);
+        chart.setRotationAngle(0);
+        // enable rotation of the chart by touch
+        chart.setRotationEnabled(true);
+        chart.setHighlightPerTapEnabled(true);
+        chart.setUsePercentValues(false);
+
+        // chart.setUnit(" €");
+        // chart.setDrawUnitsInChart(true);
+
+        // add a selection listener
+        //chart.setOnChartValueSelectedListener(this);
+        //chart.animateY(1400, Easing.EaseInOutQuad);
+        // chart.spin(2000, 0, 360);
+
+        Legend l = chart.getLegend();
+        l.setVerticalAlignment(Legend.LegendVerticalAlignment.TOP);
+        l.setHorizontalAlignment(Legend.LegendHorizontalAlignment.RIGHT);
+        l.setOrientation(Legend.LegendOrientation.VERTICAL);
+        l.setDrawInside(false);
+        l.setEnabled(false);
     }
 
     /*
@@ -144,7 +174,7 @@ public class HWtStatisticsActivity extends AppCompatActivity {
                 OkHttpClient okHttpClient = new OkHttpClient();
                 // 2、构建请求体
                 StringBuffer sb = new StringBuffer();
-                sb.append("flag=").append("2")//flag作为标志，区分请求何种数据
+                sb.append("flag=").append(flag)//flag作为标志，区分请求何种数据
                         .append("&cityName=").append(cityName)
                         .append("&date1=").append(date1)
                         .append("&date2=").append(date2);   //设置表单参数
@@ -162,39 +192,38 @@ public class HWtStatisticsActivity extends AppCompatActivity {
                     public void onFailure(Call call, IOException e) {
                         Log.d("Hweather", "onFailure: " + e.getMessage());
                     }
-
                     @Override
                     public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                         // 先判断一下服务器是否异常
                         String responseStr = response.toString();
-                        Log.e("Hweather", responseStr);
+                        //Log.e("Hweather", responseStr);
                         if (responseStr.contains("200")) {
                             // response.body().string()只能调用一次，多次调用会报错
                             String responseBodyStr = Objects.requireNonNull(response.body()).string();
-                            Log.e("fanhui",responseBodyStr);
+                            //Log.e("fanhui",responseBodyStr);
                             try {
                                 JSONObject jsonObject = new JSONObject(responseBodyStr);//获得JSONBObject对象
                                 int success = jsonObject.getInt("success");
                                 if (success == 200) {
-                                    /*
-                                    将response的result中的weathertype放入String数组（用于x轴名称显示），
-                                    total作为柱状图数值
-                                     */
+                                    //处理result
                                     JSONArray ResultJSONArray = jsonObject.getJSONArray("result");
-                                    ArrayList<BarEntry> yVals = new ArrayList<>();
-                                    ArrayList<String> xValues=new ArrayList<>();
-                                    //String[] xValues = new String[20];
+                                    ArrayList<PieEntry> entries=new ArrayList<>();//总数
+                                    ArrayList<String> xValues=new ArrayList<>();//类别
+//                                    ArrayList<Entry> entries = new ArrayList<>();
+//                                    ArrayList<Entry> entries1 = new ArrayList<>();
+//                                    ArrayList<Entry> entries2 = new ArrayList<>();
+//                                    ArrayList<String> xValues =new ArrayList<>();
                                     for (int i = 0; i < ResultJSONArray.length(); i++) {
                                         JSONObject resultJSONObject = ResultJSONArray.getJSONObject(i);
-                                        //xValues[i] = resultJSONObject.getString("xdata");
                                         xValues.add(resultJSONObject.getString("xdata"));
-                                        //BarEntry(x轴index，y轴对应数值)
-                                        yVals.add(new BarEntry(i, resultJSONObject.getInt("ydata")));
+                                        //Entry(x轴index，y轴对应数值),要求是float，需自定义设配器
+                                        entries.add(new PieEntry(resultJSONObject.getInt("ydata"),
+                                                resultJSONObject.getString("xdata")));
                                     }
                                     runOnUiThread(new Runnable() {
                                         @Override
                                         public void run() {
-                                            drawChart(yVals, xValues);//绘制柱状图函数
+                                            drawChart(entries,xValues);//绘制柱状图函数
                                         }
                                     });
                                 }
@@ -202,8 +231,8 @@ public class HWtStatisticsActivity extends AppCompatActivity {
                                 e.printStackTrace();
                             }
                         } else {
-                            Log.e("Hweather", "服务器异常");
-                            showToastInThread(HWtStatisticsActivity.this, responseStr);
+                            //Log.e("Hweather", "服务器异常");
+                            showToastInThread(HWtWindActivity.this, responseStr);
                         }
                     }
                 });
@@ -249,7 +278,7 @@ public class HWtStatisticsActivity extends AppCompatActivity {
         }
     }
 
-    //获取当前系统时间，用于提示更新时间
+    //获取当前系统时间的前一天，用于日期选择dialog的默认选中日期
     private String nowTime() {
         @SuppressLint("SimpleDateFormat") SimpleDateFormat simpleDateFormat =
                 new SimpleDateFormat("yyyy-MM-dd");// HH:mm:ss
@@ -257,55 +286,87 @@ public class HWtStatisticsActivity extends AppCompatActivity {
         return simpleDateFormat.format(date);
     }
 
-    //绘制柱状图（total-数值，weathertype-名称）
-    public void drawChart(ArrayList<BarEntry> yVals, ArrayList<String> xValues) {
+    //绘制折线图（最高温，最低温，温差，日期）
+    public void drawChart(ArrayList<PieEntry> entries,ArrayList<String> xValues) {
 
-        BarDataSet set1;
-        set1 = new BarDataSet(yVals, "weather type");//初始化柱状图数据源（单柱状图，未设置显示）
-        set1.setColors(ColorTemplate.VORDIPLOM_COLORS);//颜色设置
-        set1.setDrawValues(true);//在顶部显示柱状条数值
-        set1.setValueTextSize(11f);
-        //x轴数据设置
-        //xAxis.setLabelCount(yVals.size(),true); 设置true会位置错乱
-        xAxis.setLabelCount(yVals.size());
-        xAxis.setDrawLabels(true);
-        xAxis.setTextSize(13f);
-        IAxisValueFormatter iAxisValueFormatter = new XAxisValueFormatter(xValues);
-        xAxis.setValueFormatter(iAxisValueFormatter);
+        PieDataSet dataSet = new PieDataSet(entries, "Election Results");
+        dataSet.setSliceSpace(3f);
+        dataSet.setSelectionShift(5f);
+        // add a lot of colors
+        ArrayList<Integer> colors = new ArrayList<>();
+        for (int c : ColorTemplate.VORDIPLOM_COLORS)
+            colors.add(c);
+        for (int c : ColorTemplate.JOYFUL_COLORS)
+            colors.add(c);
+        for (int c : ColorTemplate.COLORFUL_COLORS)
+            colors.add(c);
+        for (int c : ColorTemplate.LIBERTY_COLORS)
+            colors.add(c);
+        for (int c : ColorTemplate.PASTEL_COLORS)
+            colors.add(c);
+        colors.add(ColorTemplate.getHoloBlue());
+        dataSet.setColors(colors);
 
-        ArrayList<IBarDataSet> dataSets = new ArrayList<>();
-        dataSets.add(set1);
-        BarData data = new BarData(dataSets);
+        dataSet.setValueLinePart1OffsetPercentage(80.f);
+        dataSet.setValueLinePart1Length(0.2f);
+        dataSet.setValueLinePart2Length(0.4f);
+
+        dataSet.setYValuePosition(PieDataSet.ValuePosition.OUTSIDE_SLICE);
+        PieData data = new PieData(dataSet);
+        data.setValueFormatter(new PercentFormatter());
+        data.setValueTextSize(11f);
+        data.setValueTextColor(Color.BLACK);
         data.setValueFormatter(new LargeValueFormatter());
         chart.setData(data);
-        chart.setFitBars(true);
+
+        // undo all highlights
+        chart.highlightValues(null);
+
         chart.invalidate();
     }
 
     //自定义x轴的名称显示
     public static class XAxisValueFormatter implements IAxisValueFormatter {
         private ArrayList<String> xValues;
-
-        public XAxisValueFormatter(ArrayList<String> xValues) {
-            this.xValues = xValues;
+        public XAxisValueFormatter(ArrayList<String> xValues){
+            this.xValues=xValues;
         }
-
         @Override
         public String getFormattedValue(float value, AxisBase axis) {
-            return xValues.get((int) value);
+            return xValues.get((int)value);
         }
     }
 
     //添加menu响应
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.back_button, menu);
+        getMenuInflater().inflate(R.menu.wind_menu, menu);
         return true;
     }
 
     //menu的item响应
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case android.R.id.home:
+                this.finish();
+                return true;
+            case R.id.change_type:
+                if(flag.equals("3")){
+                    flag="4";
+                    item.setTitle(R.string.change_type2);
+                    chart.setNoDataText("选择日期后查看历史风力统计");//设置空数据时的显示文本
+                    chart.setCenterText("当前查看：历史风力统计");
+                    chart.clear();
+                }else{
+                    flag="3";
+                    item.setTitle(R.string.change_type1);
+                    chart.setNoDataText("选择日期后查看历史风向统计");//设置空数据时的显示文本
+                    chart.setCenterText("当前查看：历史风向统计");
+                    chart.clear();
+                }
+                return true;
+        }
         if (item.getItemId() == android.R.id.home) {//返回键
             this.finish();
             return true;
