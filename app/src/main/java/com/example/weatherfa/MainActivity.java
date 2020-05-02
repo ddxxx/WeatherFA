@@ -86,7 +86,10 @@ public class MainActivity extends AppCompatActivity{
          NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
          NavigationUI.setupWithNavController(navigationView, navController);
     }
-
+    @Override
+    public void setRequestedOrientation(int requestedOrientation){
+        return;
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {//响应menu
         getMenuInflater().inflate(R.menu.main, menu);

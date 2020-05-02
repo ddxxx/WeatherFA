@@ -92,6 +92,10 @@ public class HWtTempActivity extends AppCompatActivity {
 
         initUI();//(函数)
     }
+    @Override
+    public void setRequestedOrientation(int requestedOrientation){
+        return;
+    }
 
     private void initUI() {
         //组件初始化
@@ -138,12 +142,13 @@ public class HWtTempActivity extends AppCompatActivity {
 
         //折线示意部分的相关设置
         Legend l = chart.getLegend();
-        l.setForm(Legend.LegendForm.LINE);
-        l.setTextSize(11f);
-        l.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM);
-        l.setHorizontalAlignment(Legend.LegendHorizontalAlignment.LEFT);
-        l.setOrientation(Legend.LegendOrientation.HORIZONTAL);//不可修改为Vertical，会显示在折线图左侧
-        l.setDrawInside(false);//在折线图外部绘制
+        l.setForm(Legend.LegendForm.LINE);//设置图例为线性
+        //l.setTextSize(11f);
+        //设置图例的摆放位置
+        l.setVerticalAlignment(Legend.LegendVerticalAlignment.TOP);//垂直顶部
+        l.setHorizontalAlignment(Legend.LegendHorizontalAlignment.LEFT);//水平居左
+        l.setOrientation(Legend.LegendOrientation.HORIZONTAL);//图例条目水平排列，不可修改为Vertical，会显示在折线图左侧
+        l.setDrawInside(true);//在折线图内部绘制（紧邻上方，不会遮挡图表）
     }
 
     /*

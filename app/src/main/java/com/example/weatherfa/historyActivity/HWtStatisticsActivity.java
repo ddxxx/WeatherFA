@@ -88,6 +88,10 @@ public class HWtStatisticsActivity extends AppCompatActivity {
 
         initUI();//(函数)
     }
+    @Override
+    public void setRequestedOrientation(int requestedOrientation){
+        return;
+    }
 
     private void initUI() {
         //组件初始化
