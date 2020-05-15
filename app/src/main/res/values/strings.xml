@@ -34,6 +34,7 @@
     <!--history-->
     <string name="h_line">温度变化分析</string>
     <string name="h_histogram">历史天气统计</string>
+    <string name="h_wind">风力风向统计</string>
 
 
     <!--wt_now-->

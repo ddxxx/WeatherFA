@@ -20,16 +20,23 @@ import com.google.gson.JsonParser;
 
 import java.io.IOException;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class RegisterActivity extends AppCompatActivity implements View.OnClickListener  {
+    //用于控制GSON request的编码格式
+    public static final MediaType FORM_CONTENT_TYPE
+            = MediaType.parse("application/x-www-form-urlencoded; charset=utf-8");
+
     // Log打印的通用Tag
     private final String TAG = "RegisterActivity";
 
@@ -51,6 +58,10 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
         initUI();//组件初始化
         setOnClickListener();//点击事件响应
+
+        setOnFocusChangeErrMsg(et_telphone, "phone", "手机号格式不正确");
+        setOnFocusChangeErrMsg(et_password1, "password1", "密码必须不少于6位");
+
     }
 
     private void initUI() { // 初始化
@@ -74,11 +85,59 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
         switch (v.getId()){
             case R.id.bt_submit_register:
+                et_telphone.clearFocus();
+                et_password1.clearFocus();
+                et_username.clearFocus();
+                et_password2.clearFocus();
                 asyncRegister(telphone,username,password1, password2);
                 // 点击提交注册按钮响应事件
                 // 尽管后端进行了判空，但Android端依然需要判空
                 break;
         }
+    }
+
+    private void setOnFocusChangeErrMsg(EditText editText,String inputType, String errMsg){
+        editText.setOnFocusChangeListener(
+                new View.OnFocusChangeListener() {
+                    @Override
+                    public void onFocusChange(View v, boolean hasFocus) {
+                        String inputStr = editText.getText().toString();
+                        if (!hasFocus){
+                            if(inputType == "phone"){
+                                if (isTelphoneValid(inputStr)){
+                                    editText.setError(null);
+                                }else {
+                                    editText.setError(errMsg);
+                                }
+                            }
+                            if (inputType == "password1"){
+                                if (isPasswordValid(inputStr)){
+                                    editText.setError(null);
+                                }else {
+                                    editText.setError(errMsg);
+                                }
+                            }
+
+                        }
+                    }
+                }
+        );
+    }
+
+    // 校验账号不能为空且必须是中国大陆手机号（宽松模式匹配）
+    private boolean isTelphoneValid(String account) {
+        if (account == null) {
+            return false;
+        }
+        // 首位为1, 第二位为3-9, 剩下九位为 0-9, 共11位数字
+        String pattern = "^[1]([3-9])[0-9]{9}$";
+        Pattern r = Pattern.compile(pattern);
+        Matcher m = r.matcher(account);
+        return m.matches();
+    }
+    // 校验密码不少于6位
+    private boolean isPasswordValid(String password) {
+        return password != null && password.trim().length() > 5;
     }
 
     // okhttp异步请求进行注册
@@ -102,11 +161,12 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                     OkHttpClient okHttpClient = new OkHttpClient();
                     // 2、构建请求体
                     // 注意这里的name 要和后端接收的参数名一一对应，否则无法传递过去
-                    RequestBody requestBody = new FormBody.Builder()
-                            .add("telphone", telphone)
-                            .add("name", username)
-                            .add("password", password1)
-                            .build();
+                    StringBuffer sb=new StringBuffer();
+                    sb.append("telphone=").append(telphone)
+                            .append("&name=").append(username)
+                            .append("&password=").append(password1);
+                    RequestBody requestBody = RequestBody.create(FORM_CONTENT_TYPE, sb.toString());
+
                     // 3、发送请求，特别强调这里是POST方式
                     Request request = new Request.Builder()
                             .url(NetConstant.getRegisterURL())
@@ -149,7 +209,15 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                                         // 注册成功后，注册界面就没必要占据资源了
                                         finish();
                                     }
-                                } else {
+                                }else if((responseBodyStr).equals("error")){
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            Toast.makeText(RegisterActivity.this,"该手机号已注册，请直接登录",
+                                                    Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                                }else {
                                     Log.e(TAG,"error");
                             //===        getResponseErrMsg(RegisterActivity.this, responseBodyStr);
                                 }
@@ -166,6 +234,9 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             Toast.makeText(RegisterActivity.this, "两次密码不一致", Toast.LENGTH_SHORT).show();
         }
     }
+
+
+
     // 使用Gson解析response的JSON数据中的status，返回布尔值
     private String getResponseStatus(JsonObject responseBodyJSONObject) {
         // Gson解析JSON，总共3步

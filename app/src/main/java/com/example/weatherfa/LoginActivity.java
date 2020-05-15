@@ -25,12 +25,16 @@ import java.util.regex.Pattern;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
+    //用于控制GSON request的编码格式
+    public static final MediaType FORM_CONTENT_TYPE
+            = MediaType.parse("application/x-www-form-urlencoded; charset=utf-8");
 
     // 声明UI对象
     Button bt_login = null;
@@ -180,10 +184,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 OkHttpClient okHttpClient = new OkHttpClient();
                 // 2、构建请求体requestBody
                 final String telphone = account;  // 为了让键和值名字相同，我把account改成了telphone，没其他意思
-                RequestBody requestBody = new FormBody.Builder()
-                        .add("telphone", telphone)
-                        .add("password", password)
-                        .build();
+                StringBuffer sb=new StringBuffer();
+                sb.append("telphone=").append(telphone)
+                        .append("&password=").append(password);
+                RequestBody requestBody = RequestBody.create(FORM_CONTENT_TYPE, sb.toString());
                 // 3、发送请求，因为要传密码，所以用POST方式
                 Request request = new Request.Builder()
                         .url(NetConstant.getLoginURL())

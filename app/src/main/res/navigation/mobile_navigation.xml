@@ -10,7 +10,7 @@
         android:id="@+id/nav_weather"
         android:name="com.example.weatherfa.ui.weather.WeatherFragment"
         android:label="@string/menu_weather"
-        tools:layout="@layout/fragment_weather"></fragment>
+        tools:layout="@layout/fragment_weather"/>
 
     <fragment
         android:id="@+id/nav_feedback"
@@ -37,5 +37,6 @@
             android:id="@+id/action_SettingFragment_to_WeatherFragment"
             app:destination="@id/nav_weather" />
     </fragment>
+
 
 </navigation>

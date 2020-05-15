@@ -10,6 +10,7 @@ package com.example.weatherfa.historyActivity;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
@@ -46,6 +47,8 @@ import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.github.mikephil.charting.formatter.LargeValueFormatter;
 import com.github.mikephil.charting.formatter.PercentFormatter;
 import com.github.mikephil.charting.utils.ColorTemplate;
+import com.xiasuhuei321.loadingdialog.manager.StyleManager;
+import com.xiasuhuei321.loadingdialog.view.LoadingDialog;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -66,6 +69,8 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class HWtWindActivity extends AppCompatActivity {
+    private StyleManager s = new StyleManager();
+    private LoadingDialog ld;
     private String flag="3";//3:风向，4:风力
     //准备存储从sp获得的城市名
     private String cityName;
@@ -106,11 +111,14 @@ public class HWtWindActivity extends AppCompatActivity {
     }
 
     private void initUI() {
+        s.Anim(false).repeatTime(0).contentSize(-1).intercept(true);
+        LoadingDialog.initStyle(s);
+        ld=new LoadingDialog(HWtWindActivity.this);
         //组件初始化
         mShowDatePickBtn = findViewById(R.id.query_bt);
         chart = findViewById(R.id.chart1);
         //设置“选择日期”的起、止、默认选中日期，格式：yyyy-MM-dd
-        allowedSmallestTime = "2016-01-01";
+        allowedSmallestTime = "2014-01-01";
         allowedBiggestTime = nowTime();
         defaultChooseDate = nowTime();
         //选择日期按钮的响应事件
@@ -140,14 +148,6 @@ public class HWtWindActivity extends AppCompatActivity {
         chart.setRotationEnabled(true);
         chart.setHighlightPerTapEnabled(true);
         chart.setUsePercentValues(false);
-
-        // chart.setUnit(" €");
-        // chart.setDrawUnitsInChart(true);
-
-        // add a selection listener
-        //chart.setOnChartValueSelectedListener(this);
-        //chart.animateY(1400, Easing.EaseInOutQuad);
-        // chart.spin(2000, 0, 360);
 
         Legend l = chart.getLegend();
         l.setVerticalAlignment(Legend.LegendVerticalAlignment.TOP);
@@ -200,19 +200,15 @@ public class HWtWindActivity extends AppCompatActivity {
                         if (responseStr.contains("200")) {
                             // response.body().string()只能调用一次，多次调用会报错
                             String responseBodyStr = Objects.requireNonNull(response.body()).string();
-                            //Log.e("fanhui",responseBodyStr);
                             try {
                                 JSONObject jsonObject = new JSONObject(responseBodyStr);//获得JSONBObject对象
                                 int success = jsonObject.getInt("success");
-                                if (success == 200) {
+                                if (success == 1) {
                                     //处理result
                                     JSONArray ResultJSONArray = jsonObject.getJSONArray("result");
                                     ArrayList<PieEntry> entries=new ArrayList<>();//总数
                                     ArrayList<String> xValues=new ArrayList<>();//类别
-//                                    ArrayList<Entry> entries = new ArrayList<>();
-//                                    ArrayList<Entry> entries1 = new ArrayList<>();
-//                                    ArrayList<Entry> entries2 = new ArrayList<>();
-//                                    ArrayList<String> xValues =new ArrayList<>();
+
                                     for (int i = 0; i < ResultJSONArray.length(); i++) {
                                         JSONObject resultJSONObject = ResultJSONArray.getJSONObject(i);
                                         xValues.add(resultJSONObject.getString("xdata"));
@@ -223,7 +219,27 @@ public class HWtWindActivity extends AppCompatActivity {
                                     runOnUiThread(new Runnable() {
                                         @Override
                                         public void run() {
+                                            ld.close();
                                             drawChart(entries,xValues);//绘制柱状图函数
+                                        }
+                                    });
+                                }else{
+                                    //请求失败，所请求的城市历史天气数据未入库
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            ld.close();
+                                            //页面返回时，弹出提示框，包括确认、取消按钮，提示文字
+                                            AlertDialog.Builder builder = new AlertDialog.Builder(HWtWindActivity.this);
+                                            builder.setTitle("提示");
+                                            builder.setMessage("未查询到当前城市历史天气数据");
+                                            builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    dialog.dismiss();
+                                                }
+                                            });
+                                            builder.show();
                                         }
                                     });
                                 }
@@ -264,6 +280,8 @@ public class HWtWindActivity extends AppCompatActivity {
                             + "至" + endTime.replace("-", "."));
                     //（函数）获取历史天气相关数据
                     asyncGetHWeather(cityName, startTime, endTime);
+                    ld.setLoadingText("加载中...")//设置loading时显示的文字
+                            .show();
                 }
             });
             //取消选择事件响应

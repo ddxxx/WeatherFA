@@ -76,15 +76,22 @@ public class MainActivity extends AppCompatActivity{
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
 
-        mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_weather,R.id.nav_userinfo,R.id.nav_setting,
-                R.id.nav_feedback, R.id.nav_about)
-                .setDrawerLayout(drawer)
-                .build();
+        //绑定当前的ActionBar，除此之外NavigationUI还能绑定Toolbar和CollapsingToolbarLayout
+        //绑定后，系统会默认处理ActionBar左上角区域，为你添加返回按钮，将所切换到的Fragment在导航图里的name属性中的内容显示到Title
+        //.setDrawerLayout(drawerLayout)后才会出现菜单按钮
+        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
 
-         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
+        mAppBarConfiguration=new AppBarConfiguration.Builder(navController.getGraph())
+                .setDrawerLayout(drawer).build();
+//        mAppBarConfiguration = new AppBarConfiguration.Builder(
+//                R.id.nav_weather,R.id.nav_userinfo,R.id.nav_setting,
+//                R.id.nav_feedback, R.id.nav_about)
+//                .setDrawerLayout(drawer)
+//                .build();
+
          NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
          NavigationUI.setupWithNavController(navigationView, navController);
+
     }
     @Override
     public void setRequestedOrientation(int requestedOrientation){
@@ -102,7 +109,7 @@ public class MainActivity extends AppCompatActivity{
                 Intent intent = new Intent();
                 intent.setClass(MainActivity.this, CityManagement.class);
                 startActivity(intent);
-                finish();
+                //finish();
                 return true;
             default://确保onSupportNavigateUp被调用
                 return super.onOptionsItemSelected(item);

@@ -63,4 +63,7 @@ dependencies {
     implementation 'com.github.PhilJay:MPAndroidChart:v3.0.2'
     implementation 'com.github.darrenfantasy:DoubleDatePicker:1.0'
 
+    implementation 'com.github.ForgetAll:LoadingDialog:v1.1.2'
+
+
 }

@@ -38,6 +38,7 @@ import java.util.Objects;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -46,6 +47,10 @@ import okhttp3.Response;
 import static android.content.Context.MODE_PRIVATE;
 
 public class UserinfoFragment extends Fragment {
+    //用于控制GSON request的编码格式
+    public static final MediaType FORM_CONTENT_TYPE
+            = MediaType.parse("application/x-www-form-urlencoded; charset=utf-8");
+
 
     private final String TAG = "UserInfoFragment";
 
@@ -53,14 +58,12 @@ public class UserinfoFragment extends Fragment {
     private Button editFinish1BT=null,editFinish2BT=null;
 
     private SharedPreferences sp;
+    private SharedPreferences.Editor editor;
     private String token_telphone;
     private String token_password;
 
-
-
     String name="";
     String opwd="",pwd1="",pwd2="";
-    private SharedPreferences.Editor editor;
 
     private UserinfoViewModel mViewModel;
     private View root;
@@ -139,9 +142,12 @@ public class UserinfoFragment extends Fragment {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
+                    //1
                     OkHttpClient okHttpClient=new OkHttpClient();
+
                     RequestBody requestBody=new FormBody.Builder()
                             .add("telphone",token_telphone)
+                            .add("opassword",opwd)
                             .add("password",pwd1)
                             .build();
                     Request request=new Request.Builder()
@@ -171,6 +177,8 @@ public class UserinfoFragment extends Fragment {
                                                 Toast.LENGTH_SHORT).show();
                                         Looper.loop();
                                         Log.e(TAG,"修改成功");
+                                        editor.putString("password",pwd1);
+                                        editor.commit();
 
                                     }
                                 }else{
@@ -202,11 +210,15 @@ public class UserinfoFragment extends Fragment {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
+                    //1
                     OkHttpClient okHttpClient=new OkHttpClient();
-                    RequestBody requestBody=new FormBody.Builder()
-                            .add("telphone",token_telphone)//加入phone，数据库搜索使用
-                            .add("name",name)
-                            .build();
+                    //2
+                    StringBuffer sb=new StringBuffer();
+                    sb.append("telphone=").append(token_telphone)
+                            .append("&name=").append(name);
+                    Log.e("gai---",sb.toString());
+                    RequestBody requestBody = RequestBody.create(FORM_CONTENT_TYPE, sb.toString());
+
                     Request request=new Request.Builder()
                             .url(NetConstant.getChangeNameURL())
                             .post(requestBody)

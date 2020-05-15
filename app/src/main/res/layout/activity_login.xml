@@ -23,7 +23,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/weatherfa_icon" />
+        app:srcCompat="@drawable/launch_icon_my" />
 
     <TextView
         android:id="@+id/tv_account"

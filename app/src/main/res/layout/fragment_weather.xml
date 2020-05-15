@@ -327,7 +327,7 @@
                                 android:layout_gravity="center_horizontal"
                                 android:layout_marginTop="4dp"
                                 android:lines="1"
-                                android:text="@string/h_histogram"
+                                android:text="@string/h_wind"
                                 android:textSize="@dimen/text_size_caption" />
 
                         </LinearLayout>

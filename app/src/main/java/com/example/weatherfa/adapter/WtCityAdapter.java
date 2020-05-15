@@ -98,12 +98,16 @@ implements View.OnClickListener{
     }
 
     //添加item
-    public void addData(WtCity city){
+    public void addData(WtCity city,int flag){//0定位，1自选
         //在list中添加
         if(mWtCityList.contains(city)){
             delDate(city);
         }
-        mWtCityList.add(mWtCityList.size(),city);
+        if(flag==0){
+            mWtCityList.add(0,city);
+        }else{
+            mWtCityList.add(mWtCityList.size(),city);
+        }
         notifyItemChanged(mWtCityList.size());//添加动画
         notifyDataSetChanged();
     }

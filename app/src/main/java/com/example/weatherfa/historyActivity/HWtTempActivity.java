@@ -9,6 +9,7 @@ package com.example.weatherfa.historyActivity;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
@@ -39,6 +40,8 @@ import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.github.mikephil.charting.formatter.LargeValueFormatter;
 import com.github.mikephil.charting.utils.ColorTemplate;
+import com.xiasuhuei321.loadingdialog.manager.StyleManager;
+import com.xiasuhuei321.loadingdialog.view.LoadingDialog;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -59,6 +62,8 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class HWtTempActivity extends AppCompatActivity {
+    private StyleManager s = new StyleManager();
+    private LoadingDialog ld;
     //准备存储从sp获得的城市名
     private String cityName;
     //日期选择相关变量
@@ -98,11 +103,14 @@ public class HWtTempActivity extends AppCompatActivity {
     }
 
     private void initUI() {
+        s.Anim(false).repeatTime(0).contentSize(-1).intercept(true);
+        LoadingDialog.initStyle(s);
+        ld=new LoadingDialog(HWtTempActivity.this);
         //组件初始化
         mShowDatePickBtn = findViewById(R.id.query_bt);
         chart = findViewById(R.id.chart1);
         //设置“选择日期”的起、止、默认选中日期，格式：yyyy-MM-dd
-        allowedSmallestTime = "2016-01-01";
+        allowedSmallestTime = "2014-01-01";
         allowedBiggestTime = nowTime();
         defaultChooseDate = nowTime();
         //选择日期按钮的响应事件
@@ -198,7 +206,7 @@ public class HWtTempActivity extends AppCompatActivity {
                             try {
                                 JSONObject jsonObject = new JSONObject(responseBodyStr);//获得JSONBObject对象
                                 int success = jsonObject.getInt("success");
-                                if (success == 200) {
+                                if (success == 1) {
                                     //处理result
                                     JSONArray ResultJSONArray = jsonObject.getJSONArray("result");
                                     ArrayList<Entry> entries = new ArrayList<>();
@@ -216,7 +224,27 @@ public class HWtTempActivity extends AppCompatActivity {
                                     runOnUiThread(new Runnable() {
                                         @Override
                                         public void run() {
+                                            ld.close();
                                             drawChart(entries,entries1,entries2,xValues);//绘制柱状图函数
+                                        }
+                                    });
+                                }else{
+                                    //请求失败，所请求的城市历史天气数据未入库
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            ld.close();
+                                            //页面返回时，弹出提示框，包括确认、取消按钮，提示文字
+                                            AlertDialog.Builder builder = new AlertDialog.Builder(HWtTempActivity.this);
+                                            builder.setTitle("提示");
+                                            builder.setMessage("未查询到当前城市历史天气数据");
+                                            builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    dialog.dismiss();
+                                                }
+                                            });
+                                            builder.show();
                                         }
                                     });
                                 }
@@ -257,6 +285,8 @@ public class HWtTempActivity extends AppCompatActivity {
                             + "至" + endTime.replace("-", "."));
                     //（函数）获取历史天气相关数据
                     asyncGetHWeather(cityName, startTime, endTime);
+                    ld.setLoadingText("加载中...")//设置loading时显示的文字
+                            .show();
                 }
             });
             //取消选择事件响应

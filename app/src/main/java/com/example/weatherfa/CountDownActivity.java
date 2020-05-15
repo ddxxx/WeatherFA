@@ -24,6 +24,7 @@ import java.io.IOException;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -36,7 +37,10 @@ public class CountDownActivity extends AppCompatActivity {
 
     final static String TAG = "CountDownActivity";
     private Boolean isLogin;
-    
+
+    //用于控制GSON request的编码格式
+    public static final MediaType FORM_CONTENT_TYPE
+            = MediaType.parse("application/x-www-form-urlencoded; charset=utf-8");
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,7 +89,8 @@ public class CountDownActivity extends AppCompatActivity {
     private void checkToJump() {
         boolean isFirstin = ModelPreference.getBoolean(CountDownActivity.this, ModelConstant.FIRST_IN, true);
         if (isFirstin) {//首次使用进入注册页
-            Intent it_to_guide = new Intent(CountDownActivity.this, RegisterActivity.class);
+            //Intent it_to_guide = new Intent(CountDownActivity.this, RegisterActivity.class);
+            Intent it_to_guide = new Intent(CountDownActivity.this, LoginActivity.class);
             startActivity(it_to_guide);
             // 关闭首次打开
             ModelPreference.putBoolean(CountDownActivity.this, ModelConstant.FIRST_IN, false);
@@ -114,10 +119,10 @@ public class CountDownActivity extends AppCompatActivity {
             public void run() {
                 OkHttpClient okHttpClient = new OkHttpClient();
                 final String telphone = account;  // 为了让键和值名字相同，我把account改成了telphone，没其他意思
-                RequestBody requestBody = new FormBody.Builder()
-                        .add("telphone", telphone)
-                        .add("password", password)
-                        .build();
+                StringBuffer sb=new StringBuffer();
+                sb.append("telphone=").append(telphone)
+                        .append("&password=").append(password);
+                RequestBody requestBody = RequestBody.create(FORM_CONTENT_TYPE, sb.toString());
                 Request request = new Request.Builder()
                         .url(NetConstant.getLoginURL())
                         .post(requestBody)

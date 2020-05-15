@@ -71,8 +71,8 @@ public class CityManagement extends AppCompatActivity {
         setTheme(R.style.DefaultCityPickerTheme);
         setContentView(R.layout.activity_city_management);
         //实例化
-        locCityTV=(TextView)findViewById(R.id.loc_city_name_tv);
-        locCityView=(View)findViewById(R.id.loc_city_lo);
+//        locCityTV=(TextView)findViewById(R.id.loc_city_name_tv);
+//        locCityView=(View)findViewById(R.id.loc_city_lo);
         cityRV=(RecyclerView)findViewById(R.id.city_recycler_view);
         //============
         delCityBT=(Button)findViewById(R.id.city_item_del_bt);
@@ -113,10 +113,10 @@ public class CityManagement extends AppCompatActivity {
                             @Override
                             public void onPick(int position, City data) {
                                 String sCity=data.getName();
-                                Toast.makeText(getApplicationContext(),
-                                        String.format("点击的数据: %s",sCity),
-                                        Toast.LENGTH_SHORT).show();
-                                addCity(sCity);
+//                                Toast.makeText(getApplicationContext(),
+//                                        String.format("点击的数据: %s",sCity),
+//                                        Toast.LENGTH_SHORT).show();
+                                addCity(sCity,1);
                             }
 
                             @Override
@@ -171,7 +171,7 @@ public class CityManagement extends AppCompatActivity {
             };
 
     //选择的城市保存到sp中
-    private void addCity(String sCity){
+    private void addCity(String sCity,int flag){
         WtCity wtCity=new WtCity(sCity);
         int i;
         for(i=0;i<wtCityList.size();i++){
@@ -181,7 +181,7 @@ public class CityManagement extends AppCompatActivity {
                 break;
             }
         }
-        adapter.addData(wtCity);
+        adapter.addData(wtCity,flag);
         saveToSP(wtCityList);
         //存储
     }
@@ -243,6 +243,7 @@ public class CityManagement extends AppCompatActivity {
                     String s1=aMapLocation.getDistrict().substring(0,aMapLocation.getDistrict().length()-1);
                     String s2=aMapLocation.getProvince().substring(0,aMapLocation.getProvince().length()-1);
                     locatedCity=new LocatedCity(s1, s2,aMapLocation.getCityCode());
+                    addCity(s1,0);
                     //loc跳转到mainactivity（但返回后回到上一个界面）
                     locCityView.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -253,7 +254,7 @@ public class CityManagement extends AppCompatActivity {
                             finish();
                         }
                     });
-                    locCityTV.setText(s1);
+                    //locCityTV.setText(s1);
                     Log.e("112233",aMapLocation.getDistrict());
                 }else{
                     //定位失败（错误码，错误信息）

@@ -28,6 +28,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.example.weatherfa.CityManagement;
 import com.example.weatherfa.MainActivity;
 import com.example.weatherfa.R;
 import com.example.weatherfa.adapter.WtForecastAdapter;
@@ -105,6 +106,12 @@ public class WeatherFragment extends Fragment{
         sp= this.getActivity().getSharedPreferences("weatherfa",this.getActivity().MODE_PRIVATE);
         editor=sp.edit();
         cityName=sp.getString("cityname",null);//获取当前城市名称
+        if(cityName==null){
+            Intent intent = new Intent();
+            intent.setClass(getActivity(), CityManagement.class);
+            startActivity(intent);
+            getActivity().finish();
+        }
         String locCityName=sp.getString("locCityName",null);//获取
         String weatherString=sp.getString("weather_info",null);//获取天气信息缓存
         String sNowTime=sp.getString("nowTime",null);
