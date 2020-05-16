@@ -7,4 +7,8 @@
         android:orderInCategory="100"
         android:title="@string/city_settings"
         app:showAsAction="always" />
+    <item
+        android:id="@+id/exit_to_login"
+        android:title="退出登录"
+        app:showAsAction="never" />
 </menu>

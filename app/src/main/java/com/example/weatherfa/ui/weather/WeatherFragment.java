@@ -131,6 +131,7 @@ public class WeatherFragment extends Fragment{
         hIM2.setImageResource(R.drawable.pie_chart);
 
         setOnClickListener();
+        requestWeather(cityName);
         //下拉刷新响应
         swipeRefreshLO.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -190,6 +191,14 @@ public class WeatherFragment extends Fragment{
                             showWeatherInfo(weather);
                             Toast.makeText(getActivity(),"获取天气信息成功",Toast.LENGTH_SHORT).show();
                             //notifyWeatherInfo();
+                            //通知栏提示相关信息
+                            String aqi_num=weather.result.realTime.wtAqi;
+
+                            if(aqi_num!=null & Integer.valueOf(aqi_num)>=100){
+                                Log.e("aqi_num",aqi_num);
+                                notifyWeatherInfo(cityName,aqi_num);
+                                aqi_num=null;
+                            }
                             swipeRefreshLO.setRefreshing(false);
                         }
                         else{
@@ -285,15 +294,14 @@ public class WeatherFragment extends Fragment{
         WtLifeIndexAdapter adapter3=new WtLifeIndexAdapter(wtLifeIndexList);
         lifeIndexRV.setAdapter(adapter3);
 
-        //通知栏提示相关信息
-        notifyWeatherInfo(cityName,wtType,wtTemp);
+
         //后台自动更新
         WtLO.setVisibility(View.VISIBLE);
         Intent intent=new Intent(getActivity(), AutoUpdateService.class);
         getActivity().startService(intent);
     }
 
-    private void notifyWeatherInfo(String cityname,String wttype,String wttemp) {
+    private void notifyWeatherInfo(String cityname,String aqi_num) {
         String channelId = "notification_simple";
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 
@@ -304,8 +312,8 @@ public class WeatherFragment extends Fragment{
             PendingIntent pendingIntent =PendingIntent.getBroadcast(getActivity(), 0, intent, 0);
 
             Notification notification = new NotificationCompat.Builder(getActivity(), channelId)
-                    .setContentTitle(cityname+"-天气信息更新成功")
-                    .setContentText("实时天气："+wttype+"\n实时温度："+wttemp+"℃")
+                    .setContentTitle("关注空气质量")
+                    .setContentText(cityname+"空气污染指数："+aqi_num)
                     .setWhen(System.currentTimeMillis())
                     .setSmallIcon(R.mipmap.ic_launcher)
                     .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher))
@@ -318,8 +326,8 @@ public class WeatherFragment extends Fragment{
             PendingIntent pendingIntent =PendingIntent.getBroadcast(getActivity(), 0, intent, 0);
 
             Notification notification = new NotificationCompat.Builder(getActivity(), channelId)
-                    .setContentTitle("天气信息更新成功")
-                    .setContentText("实时天气："+wttype+"   实时温度："+wttemp+"℃")
+                    .setContentTitle("关注空气质量")
+                    .setContentText(cityname+"空气污染指数："+aqi_num)
                     .setWhen(System.currentTimeMillis())
                     .setSmallIcon(R.mipmap.ic_launcher)
                     .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher))

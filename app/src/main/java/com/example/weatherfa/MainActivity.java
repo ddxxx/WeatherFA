@@ -46,7 +46,11 @@ import java.util.List;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity{
-    public int aaa=1;
+    //sharedpreferences
+    private SharedPreferences sp;
+    private SharedPreferences.Editor editor;
+
+
     private AppBarConfiguration mAppBarConfiguration;
 
     @Override
@@ -55,6 +59,9 @@ public class MainActivity extends AppCompatActivity{
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);//不可删改
         setSupportActionBar(toolbar);
+
+        sp=getSharedPreferences("login_info",MODE_PRIVATE);
+        editor=sp.edit();
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
@@ -104,13 +111,22 @@ public class MainActivity extends AppCompatActivity{
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item){//响应menu的item
+        Intent intent = new Intent();
         switch (item.getItemId()) {
             case R.id.city_settings:
-                Intent intent = new Intent();
                 intent.setClass(MainActivity.this, CityManagement.class);
                 startActivity(intent);
                 //finish();
                 return true;
+            case R.id.exit_to_login:
+                editor.clear();
+                editor.commit();
+                intent.setClass(MainActivity.this,LoginActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);		//将DengLuActivity至于栈顶
+                startActivity(intent);
+                DestroyActivityUtil destroyActivityUtil = new DestroyActivityUtil();
+                destroyActivityUtil.exit();        // DestroyActivityUtil类是专门用来退出程序的类，利用对象调用exit方法，即可完全退出程序
+
             default://确保onSupportNavigateUp被调用
                 return super.onOptionsItemSelected(item);
         }

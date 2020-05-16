@@ -64,7 +64,6 @@ public class SettingFragment extends Fragment {
                     Toast.makeText(getActivity(), "修改成功", Toast.LENGTH_SHORT).show();
                     NavHostFragment.findNavController(SettingFragment.this)
                             .navigate(R.id.action_SettingFragment_to_WeatherFragment);
-
                 }
             }
         });

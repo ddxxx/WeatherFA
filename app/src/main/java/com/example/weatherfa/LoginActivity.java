@@ -116,13 +116,13 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 Intent it_login_to_register = new Intent(this, RegisterActivity.class);
                 it_login_to_register.putExtra("account", account);
                 startActivity(it_login_to_register);
-                Toast.makeText(this, "注册按了", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(this, "注册按了", Toast.LENGTH_SHORT).show();
                 break;
             // 以下功能目前都没有实现
             case R.id.tv_forget_password:
                 // 跳转到修改密码界面
 
-                Toast.makeText(this, "忘记密码按了", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(this, "忘记密码按了", Toast.LENGTH_SHORT).show();
                 break;
         }
     }

@@ -54,6 +54,7 @@ public class UserinfoFragment extends Fragment {
 
     private final String TAG = "UserInfoFragment";
 
+    private TextView userInfoTV;
     private EditText editNameET=null,editOpwdET=null,editpwd1ET=null,editpwd2ET=null;
     private Button editFinish1BT=null,editFinish2BT=null;
 
@@ -61,6 +62,7 @@ public class UserinfoFragment extends Fragment {
     private SharedPreferences.Editor editor;
     private String token_telphone;
     private String token_password;
+    private String token_username;
 
     String name="";
     String opwd="",pwd1="",pwd2="";
@@ -80,6 +82,7 @@ public class UserinfoFragment extends Fragment {
         sp = Objects.requireNonNull(getActivity()).getSharedPreferences("login_info", Context.MODE_PRIVATE);
         token_telphone=sp.getString("telphone","");
         token_password=sp.getString("password","");
+        token_username=sp.getString("name","");
 
         initUI();
 
@@ -89,6 +92,9 @@ public class UserinfoFragment extends Fragment {
     private void initUI(){
         InputMethodManager inputMethodManager =(InputMethodManager)getActivity().getApplicationContext().
                 getSystemService(Context.INPUT_METHOD_SERVICE);
+
+        userInfoTV=root.findViewById(R.id.userinfo_tv);
+        userInfoTV.setText("手机号："+token_telphone);
 
         editNameET=root.findViewById(R.id.edit_name_tv);
         editFinish1BT=root.findViewById(R.id.edit_finish1_bt);
@@ -104,8 +110,6 @@ public class UserinfoFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         mViewModel = ViewModelProviders.of(this).get(UserinfoViewModel.class);
         // TODO: Use the ViewModel
-
-
 
         editFinish1BT.setOnClickListener(new View.OnClickListener() {
             @Override

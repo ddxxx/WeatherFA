@@ -136,8 +136,8 @@ public class CityManagement extends AppCompatActivity {
                             }
                             @Override
                             public void onCancel() {
-                                Toast.makeText(getApplicationContext(),
-                                        "取消选择", Toast.LENGTH_SHORT).show();
+//                                Toast.makeText(getApplicationContext(),
+//                                        "取消选择", Toast.LENGTH_SHORT).show();
                             }
                         }).show();
             }
